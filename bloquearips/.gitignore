@@ -1,0 +1,58 @@
+# ===================== #
+# Django + Tailwind     #
+# ===================== #
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+*.sqlite3
+db.sqlite3
+.env
+.venv/
+venv/
+.env.*
+
+# Django
+*.log
+*.pot
+*.pyc
+*.pyo
+*.mo
+*.db
+media/
+staticfiles/
+static_root/
+local_settings.py
+
+# Tailwind / Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+package-lock.json
+yarn.lock
+
+# Build
+dist/
+build/
+.bundle/
+*.css.map
+*.js.map
+
+# IDEs & System
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Coverage / Tests
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
