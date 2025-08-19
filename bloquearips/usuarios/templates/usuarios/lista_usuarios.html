@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% load form_tags %}
+
+{% block title %}Lista de Usuários{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-10">
+    <h1 class="text-3xl font-bold text-center mb-6">Usuários Cadastrados</h1>
+    <table class="min-w-full bg-white rounded-xl shadow-lg overflow-hidden">
+        <thead class="bg-blue-600 text-white">
+            <tr>
+                <th class="py-3 px-6 text-left">Username</th>
+                <th class="py-3 px-6 text-left">Email</th>
+                <th class="py-3 px-6 text-left">Tipo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr class="border-b hover:bg-gray-100">
+                <td class="py-3 px-6">{{ usuario.username }}</td>
+                <td class="py-3 px-6">{{ usuario.email }}</td>
+                <td class="py-3 px-6">{{ usuario.get_tipo_display }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="py-3 px-6 text-center text-gray-500">Nenhum usuário cadastrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
