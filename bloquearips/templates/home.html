@@ -3,70 +3,70 @@
 {% block title %}Home - Menu{% endblock %}
 
 {% block content %}
-<div class="flex flex-col items-center justify-center space-y-8 py-10"> 
+<div class="flex flex-col items-center justify-center space-y-8 py-8"> 
 
     <!-- Título principal -->
-    <h1 class="text-5xl font-extrabold text-blue-600 text-center">
+    <h1 class="text-5xl font-extrabold text-gray-600 text-center">
         Menu
     </h1>
 
     <!-- Cards de acesso -->
-</div>
-    <div class="flex flex-wrap justify-center gap-6 mt-6">
-        <!-- Registrar Lista -->
-        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 text-center w-72">
-            <h2 class="text-xl font-semibold text-green-600 mb-4">Registrar Lista</h2>
-            <p class="text-gray-700 mb-4">Cadastre novas listas de endereços ou usuários.</p>
-            <a href="" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-                Acessar
-            </a>
-        </div>
-
-        <!-- Endereços -->
-        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 text-center w-72">
-            <h2 class="text-xl font-semibold text-blue-600 mb-4">Endereços</h2>
-            <p class="text-gray-700 mb-4">Visualize e gerencie os endereços cadastrados.</p>
-            <a href="" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-                Endereços
-            </a>
-        </div>
-
-        <!-- Solicitações -->
-        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 text-center w-72">
-            <h2 class="text-xl font-semibold text-yellow-600 mb-4">Solicitações</h2>
-            <p class="text-gray-700 mb-4">Gerencie solicitações de bloqueio ou liberação.</p>
-            <a href="" class="inline-block bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 transition">
-                Solicitações
-            </a>
-        </div>
-
-        <!-- Listas -->
-        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 text-center w-72">
-            <h2 class="text-xl font-semibold text-purple-600 mb-4">Listas</h2>
-            <p class="text-gray-700 mb-4">Visualize todas as listas cadastradas.</p>
-            <a href="" class="inline-block bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition">
-                Listas
-            </a>
-        </div>
-
-        <!-- Solicitantes -->
-        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 text-center w-72">
-            <h2 class="text-xl font-semibold text-pink-600 mb-4">Solicitantes</h2>
-            <p class="text-gray-700 mb-4">Gerencie os solicitantes cadastrados.</p>
-            <a href="" class="inline-block bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 transition">
-                Solicitantes
-            </a>
-        </div>
-
-        <!-- Usuários -->
-        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 text-center w-72">
-            <h2 class="text-xl font-semibold text-green-600 mb-4">Usuários</h2>
-            <p class="text-gray-700 mb-4">Visualize e gerencie usuários do sistema.</p>
-            <a href="{% url 'painel_usuarios' %}" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-                Usuários
-            </a>
-        </div>
     </div>
-        
+        <div class="flex flex-wrap justify-center gap-6 mt-6">
+            <!-- Registrar Lista -->
+            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 text-center w-72">
+                <h2 class="text-xl font-semibold text-orange-600 mb-4">Registrar Lista</h2>
+                <p class="text-gray-700 mb-4">Cadastre novas listas de endereços ou usuários.</p>
+                <a href="" class="inline-block bg-orange-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                    Acessar
+                </a>
+            </div>
+
+            <!-- Endereços -->
+            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 text-center w-72">
+                <h2 class="text-xl font-semibold text-blue-600 mb-4">Endereços</h2>
+                <p class="text-gray-700 mb-4">Visualize e gerencie os endereços cadastrados.</p>
+                <a href="" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                    Endereços
+                </a>
+            </div>
+
+            <!-- Solicitações -->
+            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 text-center w-72">
+                <h2 class="text-xl font-semibold text-yellow-600 mb-4">Solicitações</h2>
+                <p class="text-gray-700 mb-4">Gerencie solicitações de bloqueio ou liberação.</p>
+                <a href="" class="inline-block bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 transition">
+                    Solicitações
+                </a>
+            </div>
+
+            <!-- Listas -->
+            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 text-center w-72">
+                <h2 class="text-xl font-semibold text-purple-600 mb-4">Listas</h2>
+                <p class="text-gray-700 mb-4">Visualize todas as listas cadastradas.</p>
+                <a href="" class="inline-block bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition">
+                    Listas
+                </a>
+            </div>
+
+            <!-- Solicitantes -->
+            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 text-center w-72">
+                <h2 class="text-xl font-semibold text-pink-600 mb-4">Solicitantes</h2>
+                <p class="text-gray-700 mb-4">Gerencie os solicitantes cadastrados.</p>
+                <a href="" class="inline-block bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 transition">
+                    Solicitantes
+                </a>
+            </div>
+
+            <!-- Usuários -->
+            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 text-center w-72">
+                <h2 class="text-xl font-semibold text-green-600 mb-4">Usuários</h2>
+                <p class="text-gray-700 mb-4">Visualize e gerencie usuários do sistema.</p>
+                <a href="{% url 'painel_usuarios' %}" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                    Usuários
+                </a>
+            </div>
+        </div>
+     </div>   
 </div>
 {% endblock %}

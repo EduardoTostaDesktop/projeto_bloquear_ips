@@ -5,6 +5,7 @@ class Usuario(AbstractUser):
     TIPOS = [
         ("noc", "NOC"),
         ("engredes", "Engenharia de Redes"),
+        ("admin", "Administrador"),
     ]
 
     tipo = models.CharField(
