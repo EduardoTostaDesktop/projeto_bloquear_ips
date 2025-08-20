@@ -1,11 +1,8 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './**/templates/**/*.html', // escaneia todos os templates
-    './**/static/**/*.js',      // escaneia JS se tiver Tailwind classes
+    './templates/**/*.html',
+    './static/**/*.js',
+    './static/**/*.css',
   ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
+  theme: { extend: {} },
 }

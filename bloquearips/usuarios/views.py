@@ -7,6 +7,10 @@ def engredes_required(view_func):
     return user_passes_test(lambda u: u.is_authenticated and u.is_engredes())(view_func)
 
 @engredes_required
+def painel_usuarios(request):
+    return render(request, 'usuarios/painel_usuarios.html')
+
+@engredes_required
 def cadastrar_usuario(request):
     if request.method == "POST":
         form = UsuarioCreateForm(request.POST)

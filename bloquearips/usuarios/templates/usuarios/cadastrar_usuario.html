@@ -5,27 +5,38 @@
 {% block title %}Cadastrar Usuário{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-center min-h-screen">
-    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+    <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md px-8 py-10 flex flex-col items-center">
         <h1 class="text-2xl font-bold text-center mb-6">Cadastrar Usuário</h1>
         <form method="POST" class="space-y-4">
             {% csrf_token %}
-            {{ form.username.label_tag }}<br>
-            {{ form.username|add_class:"w-full px-3 py-2 border rounded" }}
             
-            {{ form.email.label_tag }}<br>
-            {{ form.email|add_class:"w-full px-3 py-2 border rounded" }}
+            <div class="flex items-start flex-col justify-start">
+                {{ form.username.label_tag }}
+                {{ form.username|add_class:"w-full px-3 py-2 border rounded" }}
+            </div>
+
+            <div>
+                {{ form.email.label_tag }}
+                {{ form.email|add_class:"w-full px-3 py-2 border rounded" }}
+            </div>
+
+            <div>
+                {{ form.tipo.label_tag }}
+                {{ form.tipo|add_class:"w-full px-3 py-2 border rounded" }}
+            </div>
+
+            <div>
+                {{ form.password1.label_tag }}
+                {{ form.password1|add_class:"w-full px-3 py-2 border rounded" }}
+            </div>
+
+            <div>
+                {{ form.password2.label_tag }}
+                {{ form.password2|add_class:"w-full px-3 py-2 border rounded" }}
+            </div>
+
             
-            {{ form.tipo.label_tag }}<br>
-            {{ form.tipo|add_class:"w-full px-3 py-2 border rounded" }}
-            
-            {{ form.password1.label_tag }}<br>
-            {{ form.password1|add_class:"w-full px-3 py-2 border rounded" }}
-            
-            {{ form.password2.label_tag }}<br>
-            {{ form.password2|add_class:"w-full px-3 py-2 border rounded" }}
-            
-            <button type="submit" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition">
+            <button type="submit" class="w-full bg-green-600 text-white px-2 py-2 rounded hover:bg-green-700 transition">
                 Cadastrar
             </button>
         </form>
@@ -33,5 +44,4 @@
             Já tem conta? <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Entrar</a>
         </p>
     </div>
-</div>
 {% endblock %}
