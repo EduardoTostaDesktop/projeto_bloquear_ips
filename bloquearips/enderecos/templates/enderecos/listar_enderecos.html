@@ -75,14 +75,16 @@
                             <span class="text-green-600 font-bold">Desbloqueado</span>
                         {% endif %}
                     </td>
-                    <td class="py-3 px-6 text-center flex justify-center items-center space-x-2">
-                        <a href="{% url 'editar_endereco' endereco.id %}" class="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded">
-                            Editar
-                        </a>
-                        <button onclick="confirmDelete({{ endereco.id }})" class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded">
-                            Excluir
-                        </button>
-                    </td>
+                    {% if request.user.tipo != "noc" %}
+                        <td class="py-3 px-6 text-center flex justify-center items-center space-x-2">
+                            <a href="{% url 'editar_endereco' endereco.id %}" class="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded">
+                                Editar
+                            </a>
+                            <button onclick="confirmDelete({{ endereco.id }})" class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded">
+                                Excluir
+                            </button>
+                        </td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>

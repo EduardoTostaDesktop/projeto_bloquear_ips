@@ -28,10 +28,12 @@
         {% endif %}
         <p><strong>Criado em:</strong> {{ endereco.data_criacao|date:"d/m/Y H:i" }}</p>
 
-        <div class="flex space-x-2 mt-4">
-            <a href="{% url 'editar_endereco' endereco.id %}" class="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded">Editar</a>
-            <a href="{% url 'listar_enderecos' %}" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded">Voltar</a>
-        </div>
+        {% if request.user.tipo != "noc" %}
+            <div class="flex space-x-2 mt-4">
+                <a href="{% url 'editar_endereco' endereco.id %}" class="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded">Editar</a>
+                <a href="{% url 'listar_enderecos' %}" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded">Voltar</a>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

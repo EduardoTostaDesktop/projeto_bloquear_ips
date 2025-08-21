@@ -2,9 +2,9 @@ import ipaddress
 from django.contrib import messages
 from urllib.parse import urlparse
 from django.contrib.auth.decorators import login_required
-
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-
+from usuarios.decorators import allowed_roles
 from enderecos.forms import EnderecoForm
 from enderecos.models import Endereco
 
@@ -17,58 +17,6 @@ def painel_enderecos(request):
 def perfil_endereco(request, endereco_id):
     endereco = get_object_or_404(Endereco, id=endereco_id)
     return render(request, "enderecos/perfil_endereco.html", {"endereco": endereco})
-
-
-def detectar_tipo(endereco):
-    try:
-        ip = ipaddress.ip_address(endereco)
-        if ip.version == 4:
-            return "IPv4"
-        else:
-            return "IPv6"
-    except ValueError:
-        # Se não for IP, vamos tentar considerar como URL
-        try:
-            result = urlparse(endereco)
-            if result.scheme and result.netloc:
-                return "URL"
-        except:
-            pass
-    # Padrão se não for nem IP nem URL
-    return "DESCONHECIDO"
-
-
-def cadastrar_endereco(request):
-    if request.method == "POST":
-        form = EnderecoForm(request.POST)
-        if form.is_valid():
-            endereco_obj = form.save(commit=False)
-            endereco_obj.tipo = detectar_tipo(endereco_obj.endereco)
-            endereco_obj.save()
-            messages.success(request, "Endereço cadastrado com sucesso!")
-            return redirect("listar_enderecos")
-    else:
-        form = EnderecoForm()
-    return render(request, "enderecos/form_endereco.html", {"form": form, "titulo": "Cadastrar Endereço"})
-
-
-def editar_endereco(request, endereco_id):
-    endereco = get_object_or_404(Endereco, id=endereco_id)
-    if request.method == "POST":
-        form = EnderecoForm(request.POST, instance=endereco)
-        if form.is_valid():
-            endereco_obj = form.save(commit=False)
-            endereco_obj.tipo = detectar_tipo(endereco_obj.endereco)
-            endereco_obj.save()
-            messages.success(request, "Endereço atualizado com sucesso!")
-            return redirect("listar_enderecos")
-    else:
-        form = EnderecoForm(instance=endereco)
-    return render(request, "enderecos/form_endereco.html", {"form": form, "titulo": "Editar Endereço"})
-
-
-
-from django.db.models import Q
 
 @login_required
 def listar_enderecos(request):
@@ -99,6 +47,55 @@ def listar_enderecos(request):
     return render(request, "enderecos/listar_enderecos.html", context)
 
 
+def detectar_tipo(endereco):
+    try:
+        ip = ipaddress.ip_address(endereco)
+        if ip.version == 4:
+            return "IPv4"
+        else:
+            return "IPv6"
+    except ValueError:
+        # Se não for IP, vamos tentar considerar como URL
+        try:
+            result = urlparse(endereco)
+            if result.scheme and result.netloc:
+                return "URL"
+        except:
+            pass
+    # Padrão se não for nem IP nem URL
+    return "DESCONHECIDO"
+
+@allowed_roles(['admin', 'engredes'])
+def cadastrar_endereco(request):
+    if request.method == "POST":
+        form = EnderecoForm(request.POST)
+        if form.is_valid():
+            endereco_obj = form.save(commit=False)
+            endereco_obj.tipo = detectar_tipo(endereco_obj.endereco)
+            endereco_obj.save()
+            messages.success(request, "Endereço cadastrado com sucesso!")
+            return redirect("listar_enderecos")
+    else:
+        form = EnderecoForm()
+    return render(request, "enderecos/form_endereco.html", {"form": form, "titulo": "Cadastrar Endereço"})
+
+@allowed_roles(['admin', 'engredes'])
+def editar_endereco(request, endereco_id):
+    endereco = get_object_or_404(Endereco, id=endereco_id)
+    if request.method == "POST":
+        form = EnderecoForm(request.POST, instance=endereco)
+        if form.is_valid():
+            endereco_obj = form.save(commit=False)
+            endereco_obj.tipo = detectar_tipo(endereco_obj.endereco)
+            endereco_obj.save()
+            messages.success(request, "Endereço atualizado com sucesso!")
+            return redirect("listar_enderecos")
+    else:
+        form = EnderecoForm(instance=endereco)
+    return render(request, "enderecos/form_endereco.html", {"form": form, "titulo": "Editar Endereço"})
+
+
+@allowed_roles(['admin', 'engredes'])
 def excluir_endereco(request, endereco_id):
     endereco = get_object_or_404(Endereco, id=endereco_id)
     endereco.delete()
