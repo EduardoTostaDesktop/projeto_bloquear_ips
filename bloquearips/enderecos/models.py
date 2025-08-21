@@ -9,13 +9,24 @@ class Endereco(models.Model):
         ("url", "URL"),
     ]
 
+    # Este campo será atualizado quando criarmos o app 'listas'
+    lista = models.ForeignKey(
+        "listas.Lista",  # App futuro
+        on_delete=models.CASCADE,
+        related_name="enderecos",
+        null=True,
+        blank=True
+    )
+
     endereco = models.CharField(max_length=100, unique=True)
     tipo = models.CharField(max_length=10, choices=TIPOS, editable=False)
     status = models.BooleanField(default=False)  # False = desbloqueado, True = bloqueado
     nome = models.CharField(max_length=100, blank=True, null=True)
     desc = models.TextField(blank=True, null=True)
     obs = models.TextField(blank=True, null=True)
+
     data_criacao = models.DateTimeField(auto_now_add=True)
+    data_desbloqueio = models.DateField(blank=True, null=True)  # Novo campo
 
     def save(self, *args, **kwargs):
         # Detectar tipo automaticamente
@@ -23,13 +34,13 @@ class Endereco(models.Model):
             ip_obj = ipaddress.ip_address(self.endereco)
             self.tipo = "ipv4" if ip_obj.version == 4 else "ipv6"
         except ValueError:
-            # Não é IP, testar URL
             validator = URLValidator()
             try:
                 validator(self.endereco)
                 self.tipo = "url"
             except:
-                self.tipo = "url"  # Se não for IP válido, consideramos URL
+                self.tipo = "url"  # Caso não seja IP válido, assume URL
+
         super().save(*args, **kwargs)
 
     def __str__(self):
