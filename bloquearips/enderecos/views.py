@@ -65,6 +65,21 @@ def detectar_tipo(endereco):
     # Padrão se não for nem IP nem URL
     return "DESCONHECIDO"
 
+
+@allowed_roles(['admin', 'engredes'])
+def massa_enderecos(request):
+    if request.method == "POST":
+        ids = request.POST.getlist('ids')  # lista de ids selecionados
+        acao = request.POST.get('acao')    # 'bloquear' ou 'desbloquear'
+
+        enderecos = Endereco.objects.filter(id__in=ids)
+        for endereco in enderecos:
+            endereco.status = True if acao == "bloquear" else False
+            endereco.save()
+
+    return redirect('listar_enderecos')
+
+
 @allowed_roles(['admin', 'engredes'])
 def cadastrar_endereco(request):
     if request.method == "POST":
