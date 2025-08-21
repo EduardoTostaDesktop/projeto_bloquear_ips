@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-10">
+    <h1 class="text-3xl font-bold text-gray-700 mb-6">{{ titulo }}</h1>
+
+    <form method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        {% csrf_token %}
+
+        <!-- Endereço -->
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="id_endereco">
+                Endereço
+            </label>
+            {{ form.endereco }}
+        </div>
+
+        <!-- Nome -->
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="id_nome">
+                Nome
+            </label>
+            {{ form.nome }}
+        </div>
+
+        <!-- Descrição -->
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="id_desc">
+                Descrição
+            </label>
+            {{ form.desc }}
+        </div>
+
+        <!-- Observação -->
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="id_obs">
+                Observação
+            </label>
+            {{ form.obs }}
+        </div>
+
+        <!-- Status -->
+        <div class="mb-6">
+            <label class="inline-flex items-center">
+                {{ form.status }}
+                <span class="ml-2 text-gray-700 text-sm">Bloqueado</span>
+            </label>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                Salvar
+            </button>
+            <a href="{% url 'listar_enderecos' %}" class="inline-block align-baseline font-bold text-sm text-blue-600 hover:text-blue-800">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

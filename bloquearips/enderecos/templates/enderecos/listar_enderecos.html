@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lista de Endereços{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-10 flex flex-col items-center">
+
+    <h1 class="text-3xl font-bold text-center mb-6">Endereços Cadastrados</h1>
+
+    <!-- Filtros -->
+    <div class="w-full md:w-1/2 mb-6 flex space-x-2">
+        <!-- Input de busca -->
+        <div class="flex-1 my-2 p-1 bg-white flex border border-gray-200 rounded">
+            <input 
+                placeholder="Buscar por endereço, nome ou descrição" 
+                class="p-2 appearance-none outline-none w-full text-gray-800"
+                id="searchInput"
+            >
+            <div class="text-gray-300 w-8 py-1 pl-2 pr-1 border-l flex items-center border-gray-200">
+                <button class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none" onclick="filterTable()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m1.85-5.15A7 7 0 1110 3a7 7 0 018.5 8.5z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Dropdown de tipo -->
+        <select id="tipoFilter" class="my-2 p-2 border border-gray-200 rounded" onchange="filterTable()">
+            <option value="">Todos os tipos</option>
+            <option value="ipv4">IPv4</option>
+            <option value="ipv6">IPv6</option>
+            <option value="url">URL</option>
+        </select>
+
+        <!-- Dropdown de status -->
+        <select id="statusFilter" class="my-2 p-2 border border-gray-200 rounded" onchange="filterTable()">
+            <option value="">Todos os status</option>
+            <option value="bloqueado">Bloqueado</option>
+            <option value="desbloqueado">Desbloqueado</option>
+        </select>
+    </div>
+
+      <!-- Tabela de endereços -->
+    <div class="w-full md:w-3/4 overflow-x-auto">
+        <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full">
+            <thead class="bg-gray-600 text-white">
+                <tr>
+                    <th class="py-3 px-6 text-left">Endereço</th>
+                    <th class="py-3 px-6 text-left">Tipo</th>
+                    <th class="py-3 px-6 text-left">Nome</th>
+                    <th class="py-3 px-6 text-left">Descrição</th>
+                    <th class="py-3 px-6 text-left">Observação</th>
+                    <th class="py-3 px-6 text-left">Status</th>
+                    <th class="py-3 px-6 text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="enderecosTable">
+                {% for endereco in enderecos %}
+                <tr class="border-b hover:bg-gray-100">
+                    <td class="py-3 px-6 text-blue-600 hover:underline">
+                        <a href="{% url 'perfil_endereco' endereco.id %}">
+                            {{ endereco.endereco }}
+                        </a>
+                    </td>
+                    <td class="py-3 px-6">{{ endereco.tipo|upper }}</td>
+                    <td class="py-3 px-6 truncate max-w-xs" title="{{ endereco.nome }}">{{ endereco.nome|default_if_none:""|truncatechars:10 }}</td>
+                    <td class="py-3 px-6 truncate max-w-xs" title="{{ endereco.desc }}">{{ endereco.desc|default_if_none:""|truncatechars:10 }}</td>
+                    <td class="py-3 px-6 truncate max-w-xs" title="{{ endereco.obs }}">{{ endereco.obs|default_if_none:""|truncatechars:10 }}</td>
+                    <td class="py-3 px-6 text-center">
+                        {% if endereco.status %}
+                            <span class="text-red-600 font-bold">Bloqueado</span>
+                        {% else %}
+                            <span class="text-green-600 font-bold">Desbloqueado</span>
+                        {% endif %}
+                    </td>
+                    <td class="py-3 px-6 text-center flex justify-center items-center space-x-2">
+                        <a href="{% url 'editar_endereco' endereco.id %}" class="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded">
+                            Editar
+                        </a>
+                        <button onclick="confirmDelete({{ endereco.id }})" class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded">
+                            Excluir
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Script para filtrar tabela -->
+<script>
+function filterTable() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const tipo = document.getElementById('tipoFilter').value;
+    const status = document.getElementById('statusFilter').value;
+    const rows = document.querySelectorAll('#enderecosTable tr');
+
+    rows.forEach(row => {
+        const enderecoText = row.cells[0]?.textContent.toLowerCase() || '';
+        const nomeText = row.cells[2]?.textContent.toLowerCase() || '';
+        const descText = row.cells[3]?.textContent.toLowerCase() || '';
+        const obsText = row.cells[4]?.textContent.toLowerCase() || '';
+        const tipoText = row.cells[1]?.textContent || '';
+        const statusText = row.cells[5]?.textContent.toLowerCase() || '';
+
+        const matchesText = enderecoText.includes(input) || nomeText.includes(input) || descText.includes(input) || obsText.includes(input);
+        const matchesTipo = tipo === "" || tipoText === tipo.toUpperCase();
+        const matchesStatus = status === "" || statusText === status;
+
+        if (matchesText && matchesTipo && matchesStatus) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function confirmDelete(enderecoId) {
+    if (confirm('Tem certeza que deseja excluir este endereço?')) {
+        window.location.href = `/enderecos/excluir/${enderecoId}/`;
+    }
+}
+</script>
+{% endblock %}

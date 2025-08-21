@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class SolicitacoesConfig(AppConfig):
+class EnderecosConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'solicitacoes'
+    name = 'enderecos'

@@ -1,0 +1,36 @@
+from django.db import models
+from django.core.validators import URLValidator
+import ipaddress
+
+class Endereco(models.Model):
+    TIPOS = [
+        ("ipv4", "IPv4"),
+        ("ipv6", "IPv6"),
+        ("url", "URL"),
+    ]
+
+    endereco = models.CharField(max_length=100, unique=True)
+    tipo = models.CharField(max_length=10, choices=TIPOS, editable=False)
+    status = models.BooleanField(default=False)  # False = desbloqueado, True = bloqueado
+    nome = models.CharField(max_length=100, blank=True, null=True)
+    desc = models.TextField(blank=True, null=True)
+    obs = models.TextField(blank=True, null=True)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        # Detectar tipo automaticamente
+        try:
+            ip_obj = ipaddress.ip_address(self.endereco)
+            self.tipo = "ipv4" if ip_obj.version == 4 else "ipv6"
+        except ValueError:
+            # Não é IP, testar URL
+            validator = URLValidator()
+            try:
+                validator(self.endereco)
+                self.tipo = "url"
+            except:
+                self.tipo = "url"  # Se não for IP válido, consideramos URL
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.endereco} ({self.tipo}) - {'Bloqueado' if self.status else 'Desbloqueado'}"
