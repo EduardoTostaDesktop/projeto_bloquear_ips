@@ -10,7 +10,7 @@ def painel_usuarios(request):
     return render(request, 'usuarios/painel_usuarios.html')
 
 # Apenas administradores podem cadastrar usuários
-@admin_required
+
 def cadastrar_usuario(request):
     if request.method == "POST":
         form = UsuarioCreateForm(request.POST)

@@ -12,14 +12,12 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Lista',
+            name='Solicitante',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('nome', models.CharField(max_length=100)),
-                ('data_registro', models.DateTimeField(auto_now_add=True)),
-                ('desc', models.TextField(blank=True, null=True)),
+                ('contato', models.CharField(blank=True, max_length=100, null=True)),
                 ('obs', models.TextField(blank=True, null=True)),
-                ('data_prevista_desbloqueio', models.DateTimeField(blank=True, null=True)),
             ],
         ),
     ]

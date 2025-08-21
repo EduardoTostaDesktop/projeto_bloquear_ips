@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Listas{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-10 flex flex-col items-center">
+
+    <h1 class="text-3xl font-bold mb-6">Listas Cadastradas</h1>
+
+    <div class="w-full md:w-3/4 overflow-x-auto">
+        <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full">
+            <thead class="bg-gray-600 text-white">
+                <tr>
+                    <th class="py-3 px-6 text-left">Nome</th>
+                    <th class="py-3 px-6 text-left">Solicitante</th>
+                    <th class="py-3 px-6 text-left">Criador</th>
+                    <th class="py-3 px-6 text-left">Data Registro</th>
+                    <th class="py-3 px-6 text-left">Data Prevista Desbloqueio</th>
+                    <th class="py-3 px-6 text-left">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lista in listas %}
+                <tr class="border-b hover:bg-gray-100">
+                    <td class="py-3 px-6">{{ lista.nome }}</td>
+                    <td class="py-3 px-6">{{ lista.solicitante }}</td>
+                    <td class="py-3 px-6">{{ lista.criador }}</td>
+                    <td class="py-3 px-6">{{ lista.data_registro|date:"d/m/Y H:i" }}</td>
+                    <td class="py-3 px-6">{{ lista.data_prevista_desbloqueio|date:"d/m/Y" }}</td>
+                    <td class="py-3 px-6 flex space-x-2">
+                        <a href="{% url 'listas:detalhar_lista' lista.id %}" class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded">Detalhes</a>
+                        <a href="{% url 'listas:editar_lista' lista.id %}" class="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded">Editar</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4">Nenhuma lista cadastrada.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

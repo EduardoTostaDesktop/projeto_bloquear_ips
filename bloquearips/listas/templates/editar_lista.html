@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Editar Lista{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-10 flex flex-col items-center">
+    <h1 class="text-3xl font-bold mb-6">Editar Lista: {{ lista.nome }}</h1>
+
+    <form method="POST" class="w-full md:w-1/2 bg-white p-6 rounded shadow">
+        {% csrf_token %}
+
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Nome da Lista</label>
+            <input type="text" name="nome" value="{{ lista.nome }}" required class="w-full p-2 border rounded">
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Solicitante</label>
+            <select name="solicitante" required class="w-full p-2 border rounded">
+                {% for solicitante in solicitantes %}
+                <option value="{{ solicitante.id }}" {% if solicitante.id == lista.solicitante.id %}selected{% endif %}>
+                    {{ solicitante.nome }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Descrição</label>
+            <textarea name="desc" class="w-full p-2 border rounded" rows="2">{{ lista.desc }}</textarea>
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Observação</label>
+            <textarea name="obs" class="w-full p-2 border rounded" rows="2">{{ lista.obs }}</textarea>
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Data Prevista de Desbloqueio</label>
+            <input type="date" name="data_prevista_desbloqueio" value="{{ lista.data_prevista_desbloqueio|date:'Y-m-d' }}" class="w-full p-2 border rounded">
+        </div>
+
+        <div class="flex justify-end">
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Salvar Alterações
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

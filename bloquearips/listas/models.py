@@ -1,19 +1,20 @@
 from django.db import models
-from django.conf import settings
+from django.conf import settings  # Para referenciar o model de usuários
 
 class Lista(models.Model):
-    nome = models.CharField(max_length=150)
-    descricao = models.TextField(blank=True, null=True)
-
-    # Data padrão de desbloqueio da lista (opcional).
-    # Se um endereço não trouxer sua própria data, herdará esta.
-    data_desbloqueio_padrao = models.DateField(blank=True, null=True)
-
-    criado_por = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
-        null=True, blank=True, related_name='listas_criadas'
+    nome = models.CharField(max_length=100)
+    solicitante = models.ForeignKey(
+        'solicitantes.Solicitante',  # Supondo que você tenha um app "solicitantes"
+        on_delete=models.PROTECT
     )
-    criado_em = models.DateTimeField(auto_now_add=True)
+    data_registro = models.DateTimeField(auto_now_add=True)
+    desc = models.TextField(blank=True, null=True)
+    obs = models.TextField(blank=True, null=True)
+    criador = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  # Para relacionar com o usuário do Django
+        on_delete=models.PROTECT
+    )
+    data_prevista_desbloqueio = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return self.nome
+        return f"{self.nome} ({self.solicitante})"

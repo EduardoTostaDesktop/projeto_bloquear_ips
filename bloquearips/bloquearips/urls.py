@@ -7,4 +7,6 @@ urlpatterns = [
     path('', views.homepage, name='home'),
     path('usuarios/', include('usuarios.urls')), 
     path('enderecos/', include('enderecos.urls')),
+    path('listas/', include('listas.urls')),  # Incluir URLs do app listas
+    path('solicitantes/', include('solicitantes.urls')),  # Incluir URLs do app solicitantes
 ]

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Painel de Solicitantes{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center space-y-8 py-8"> 
+
+    <!-- Título principal -->
+    <h1 class="text-5xl font-extrabold text-gray-600 text-center">
+        Painel de Solicitantes
+    </h1>
+
+    <!-- Cards de acesso -->
+    <div class="flex flex-wrap justify-center gap-6 mt-6">
+
+        <!-- Cadastrar Solicitante -->
+        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 text-center w-72">
+            <h2 class="text-xl font-semibold text-blue-600 mb-4">Cadastrar Solicitante</h2>
+            <p class="text-gray-700 mb-4">Adicione novas empresas ou contatos que solicitam bloqueios.</p>
+            <a href="{% url 'solicitantes:cadastrar_solicitante' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                Cadastrar
+            </a>
+        </div>
+
+        <!-- Listar Solicitantes -->
+        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 text-center w-72">
+            <h2 class="text-xl font-semibold text-green-600 mb-4">Listar Solicitantes</h2>
+            <p class="text-gray-700 mb-4">Visualize e gerencie todos os solicitantes cadastrados.</p>
+            <a href="{% url 'solicitantes:listar_solicitantes' %}" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                Listar
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

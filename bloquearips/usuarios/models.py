@@ -19,14 +19,3 @@ class Usuario(AbstractUser):
 
     def is_engredes(self):
         return self.tipo == "engredes"
-
-
-class Solicitante(models.Model):
-    nome = models.CharField(max_length=100)
-    criador = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    data_criacao = models.DateTimeField(auto_now_add=True)
-    descricao = models.TextField(null=True, blank=True)
-    obs = models.TextField(null=True, blank=True)
-
-    def __str__(self):
-        return self.nome

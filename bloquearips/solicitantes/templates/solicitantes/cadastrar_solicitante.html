@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Cadastrar Solicitante{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-4">Novo Solicitante</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="mb-4">
+        <label class="block mb-1">Nome</label>
+        <input type="text" name="nome" class="w-full p-2 border rounded" required>
+    </div>
+    <div class="mb-4">
+        <label class="block mb-1">Contato</label>
+        <input type="text" name="contato" class="w-full p-2 border rounded">
+    </div>
+    <div class="mb-4">
+        <label class="block mb-1">Observações</label>
+        <textarea name="obs" class="w-full p-2 border rounded"></textarea>
+    </div>
+    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Salvar</button>
+    <a href="{% url 'solicitantes:listar_solicitantes' %}" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancelar</a>
+</form>
+{% endblock %}

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'usuarios',
     'enderecos',
     'listas',
+    'solicitantes',
 ]
 
 MIDDLEWARE = [
