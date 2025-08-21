@@ -11,7 +11,7 @@ class Endereco(models.Model):
 
     # Este campo será atualizado quando criarmos o app 'listas'
     lista = models.ForeignKey(
-        "listas.Lista",  # App futuro
+        'listas.Lista',  # App futuro
         on_delete=models.CASCADE,
         related_name="enderecos",
         null=True,
