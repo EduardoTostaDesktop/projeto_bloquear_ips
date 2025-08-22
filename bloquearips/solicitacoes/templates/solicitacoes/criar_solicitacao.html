@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Nova Solicitação{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-10">
+    <h1 class="text-3xl font-bold mb-6">Criar Nova Solicitação</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 space-y-4">
+
+            <!-- Tipo de solicitação -->
+            <div>
+                <label class="block font-semibold mb-1">Tipo de Solicitação:</label>
+                <select name="tipo" class="border p-2 rounded w-full">
+                    <option value="BLOQUEIO">Bloqueio</option>
+                    <option value="DESBLOQUEIO">Desbloqueio</option>
+                </select>
+            </div>
+
+            <!-- Selecionar lista existente -->
+            <div>
+                <label class="block font-semibold mb-1">Lista existente:</label>
+                <select name="lista_existente" class="border p-2 rounded w-full">
+                    <option value="">-- Selecione uma lista --</option>
+                    {% for lista in listas %}
+                        <option value="{{ lista.id }}">{{ lista.nome }} ({{ lista.solicitante }})</option>
+                    {% endfor %}
+                </select>
+                <p class="text-gray-500 text-sm mt-1">Escolha uma lista existente ou crie uma nova abaixo.</p>
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Criar nova lista -->
+            <div>
+                <h2 class="font-semibold mb-2">Nova Lista (opcional)</h2>
+
+                <div class="mb-2">
+                    <label class="block mb-1">Nome da Lista:</label>
+                    <input type="text" name="nome_lista" class="border p-2 rounded w-full">
+                </div>
+
+                <div class="mb-2">
+                    <label class="block mb-1">Solicitante:</label>
+                    <select name="solicitante_lista" class="border p-2 rounded w-full">
+                        <option value="">-- Selecione um solicitante --</option>
+                        {% for s in solicitantes %}
+                            <option value="{{ s.id }}">{{ s.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-2">
+                    <label class="block mb-1">Descrição:</label>
+                    <textarea name="desc_lista" class="border p-2 rounded w-full"></textarea>
+                </div>
+
+                <div class="mb-2">
+                    <label class="block mb-1">Observações:</label>
+                    <textarea name="obs_lista" class="border p-2 rounded w-full"></textarea>
+                </div>
+
+                <div class="mb-2">
+                    <label class="block mb-1">Arquivo de endereços (Excel):</label>
+                    <input type="file" name="arquivo_csv" accept=".xlsx,.xls" class="border p-2 rounded w-full">
+                </div>
+            </div>
+
+            <!-- Botão enviar -->
+            <div class="flex justify-end">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    Criar Solicitação
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

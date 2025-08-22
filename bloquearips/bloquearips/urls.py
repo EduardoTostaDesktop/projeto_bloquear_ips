@@ -9,4 +9,5 @@ urlpatterns = [
     path('enderecos/', include('enderecos.urls')),
     path('listas/', include('listas.urls')),  # Incluir URLs do app listas
     path('solicitantes/', include('solicitantes.urls')),  # Incluir URLs do app solicitantes
+    path('solicitacoes/', include('solicitacoes.urls')),
 ]

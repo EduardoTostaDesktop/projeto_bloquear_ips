@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Solicitações{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-10 flex flex-col items-center">
+
+    <h1 class="text-3xl font-bold mb-6">Solicitações Cadastradas</h1>
+
+    <form id="solicitacoesForm" method="POST" action="{% url 'solicitacoes:excluir_solicitacoes_massa' %}">
+        {% csrf_token %}
+        <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full overflow-x-auto mx-auto">
+            <div class="mb-4 flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
+                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                    Excluir Selecionadas
+                </button>
+                <a href="{% url 'solicitacoes:criar_solicitacao' %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition">
+                    + Nova Solicitação
+                </a>
+            </div>
+
+            <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full text-sm md:text-base">
+                <thead class="bg-gray-600 text-white">
+                    <tr>
+                        <th class="py-3 px-6">
+                            <input type="checkbox" id="selectAll" onclick="toggleAll(this)">
+                        </th>
+                        <th class="py-3 px-6 text-left">Lista</th>
+                        <th class="py-3 px-6 text-left">Tipo</th>
+                        <th class="py-3 px-6 text-left">Status</th>
+                        <th class="py-3 px-6 text-left">Solicitante</th>
+                        <th class="py-3 px-6 text-left">Criado Por</th>
+                        <th class="py-3 px-6 text-left">Data Criação</th>
+                        <th class="py-3 px-6 text-left">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in solicitacoes %}
+                    <tr class="border-b hover:bg-gray-100">
+                        <td class="py-3 px-6">
+                            <input type="checkbox" class="selectRow" name="ids" value="{{ s.id }}">
+                        </td>
+                        <td class="py-3 px-6">
+                            <a href="{% url 'listas:detalhar_lista' s.lista.id %}" class="text-blue-600 hover:underline">
+                                {{ s.lista.nome }}
+                            </a>
+                        </td>
+                        <td class="py-3 px-6">{{ s.get_tipo_display }}</td>
+                        <td class="py-3 px-6">{{ s.get_status_display }}</td>
+                        <td class="py-3 px-6">{{ s.solicitante }}</td>
+                        <td class="py-3 px-6">{{ s.criado_por }}</td>
+                        <td class="py-3 px-6">{{ s.data_criacao|date:"d/m/Y H:i" }}</td>
+                        <td class="py-3 px-6 flex space-x-2">
+                            <a href="{% url 'solicitacoes:detalhar_solicitacao' s.id %}" class="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transition">
+                                Detalhar
+                            </a>
+                            <button type="button" onclick="confirmDelete({{ s.id }})" class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg">
+                                Excluir
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-6 text-gray-500 italic">
+                            Nenhuma solicitação cadastrada no momento.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+
+<script>
+function toggleAll(master) {
+    const checkboxes = document.querySelectorAll('.selectRow');
+    checkboxes.forEach(cb => cb.checked = master.checked);
+}
+
+function confirmDelete(solicitacaoId) {
+    if (confirm('Tem certeza que deseja excluir esta solicitação?')) {
+        window.location.href = `/solicitacoes/excluir/${solicitacaoId}/`;
+    }
+}
+</script>
+{% endblock %}
