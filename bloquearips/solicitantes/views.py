@@ -1,6 +1,5 @@
-from pyexpat.errors import messages
 from django.shortcuts import render, get_object_or_404, redirect
-
+from django.contrib import messages  # ✅ CORRETO
 from usuarios.decorators import allowed_roles
 from .models import Solicitante
 from django.contrib.auth.decorators import login_required
@@ -45,3 +44,11 @@ def editar_solicitante(request, solicitante_id):
         return redirect('solicitantes:detalhar_solicitante', solicitante_id=solicitante.id)
 
     return render(request, 'solicitantes/editar_solicitante.html', {'solicitante': solicitante})
+
+@allowed_roles(['admin', 'engredes'])
+def excluir_solicitante(request, solicitante_id):
+    solicitante = get_object_or_404(Solicitante, id=solicitante_id)
+    nome = solicitante.nome
+    solicitante.delete()
+    messages.success(request, f'Solicitante "{nome}" excluído com sucesso!')
+    return redirect('solicitantes:listar_solicitantes')

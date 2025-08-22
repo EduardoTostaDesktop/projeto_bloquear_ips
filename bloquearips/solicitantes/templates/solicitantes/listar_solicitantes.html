@@ -54,6 +54,11 @@
                     <td class="py-3 px-6">{{ s.contato }}</td>
                     <td class="py-3 px-6 text-center flex justify-center space-x-2">
                         <a href="{% url 'solicitantes:editar_solicitante' s.id %}" class="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded">Editar</a>
+                        <a href="{% url 'solicitantes:excluir_solicitante' s.id %}" 
+                        onclick="return confirm('Tem certeza que deseja excluir este solicitante?');"
+                        class="px-2 sm:px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs sm:text-sm">
+                        Excluir
+                        </a>                    
                     </td>
                 </tr>
                 {% endfor %}
