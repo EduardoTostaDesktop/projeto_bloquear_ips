@@ -8,8 +8,16 @@
 
     <h1 class="text-3xl font-bold mb-6">Listas Cadastradas</h1>
 
-    <div class="w-full md:w-3/4 overflow-x-auto">
-        <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full">
+    <!-- Botão criar lista -->
+    <div class="w-full md:w-3/4 flex justify-end mb-4">
+        <a href="{% url 'listas:criar_lista' %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition">
+            + Nova Lista
+        </a>
+    </div>
+
+    <!-- Tabela de listas -->
+    <div class="w-full md:w-3/4 overflow-x-auto shadow-lg rounded-xl">
+        <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full text-sm md:text-base">
             <thead class="bg-gray-600 text-white">
                 <tr>
                     <th class="py-3 px-6 text-left">Nome</th>
@@ -27,20 +35,33 @@
                     <td class="py-3 px-6">{{ lista.solicitante }}</td>
                     <td class="py-3 px-6">{{ lista.criador }}</td>
                     <td class="py-3 px-6">{{ lista.data_registro|date:"d/m/Y H:i" }}</td>
-                    <td class="py-3 px-6">{{ lista.data_prevista_desbloqueio|date:"d/m/Y" }}</td>
+                    <td class="py-3 px-6">
+                        {% if lista.data_prevista_desbloqueio %}
+                            {{ lista.data_prevista_desbloqueio|date:"d/m/Y" }}
+                        {% else %}
+                            <span class="text-gray-400 italic">—</span>
+                        {% endif %}
+                    </td>
                     <td class="py-3 px-6 flex space-x-2">
-                        <a href="{% url 'listas:detalhar_lista' lista.id %}" class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded">Detalhes</a>
-                        <a href="{% url 'listas:editar_lista' lista.id %}" class="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded">Editar</a>
+                        <a href="{% url 'listas:detalhar_lista' lista.id %}"
+                           class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition">
+                           Detalhes
+                        </a>
+                        <a href="{% url 'listas:editar_lista' lista.id %}"
+                           class="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded-lg transition">
+                           Editar
+                        </a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center py-4">Nenhuma lista cadastrada.</td>
+                    <td colspan="6" class="text-center py-6 text-gray-500 italic">
+                        Nenhuma lista cadastrada no momento.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-
 </div>
 {% endblock %}

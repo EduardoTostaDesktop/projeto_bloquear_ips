@@ -9,6 +9,10 @@ from enderecos.models import Endereco
 from solicitantes.models import Solicitante
 
 @allowed_roles(['admin', 'engredes'])
+def painel_listas(request):
+    return render(request, 'listas/painel_listas.html')
+
+@allowed_roles(['admin', 'engredes'])
 def listar_listas(request):
     listas = Lista.objects.all().order_by('-data_registro')
     return render(request, 'listas/listar_listas.html', {'listas': listas})
@@ -29,22 +33,47 @@ def criar_lista(request):
         arquivo = request.FILES.get('arquivo_csv')
         criador = request.user
 
+        if not solicitante_id:
+            messages.error(request, "Selecione um solicitante válido.")
+            return redirect('listas:criar_lista')
+
+        from datetime import datetime
+        if data_prevista_desbloqueio:
+            try:
+                data_prevista_desbloqueio = datetime.strptime(data_prevista_desbloqueio, "%Y-%m-%d")
+            except ValueError:
+                messages.error(request, "Formato de data inválido. Use YYYY-MM-DD.")
+                return redirect('listas:criar_lista')
+        else:
+            data_prevista_desbloqueio = None
+
         lista = Lista.objects.create(
             nome=nome,
             solicitante_id=solicitante_id,
             desc=desc,
             obs=obs,
             criador=criador,
-            data_prevista_desbloqueio=data_prevista_desbloqueio or None
+            data_prevista_desbloqueio=data_prevista_desbloqueio
         )
 
         if arquivo:
             decoded_file = arquivo.read().decode('utf-8').splitlines()
             reader = csv.reader(decoded_file)
-            for row in reader:
+
+            for i, row in enumerate(reader):
+                # Pula cabeçalho, se existir
+                if i == 0 and "endereco" in row[0].lower():
+                    continue
+
+                if not row or not row[0].strip():
+                    continue
+
                 endereco_text = row[0].strip()
-                if endereco_text and not Endereco.objects.filter(endereco=endereco_text).exists():
-                    Endereco.objects.create(endereco=endereco_text, lista=lista)
+
+        # Evita duplicatas
+        if not Endereco.objects.filter(endereco=endereco_text, lista=lista).exists():
+            Endereco.objects.create(endereco=endereco_text, lista=lista)
+
 
         messages.success(request, "Lista criada com sucesso!")
         return redirect('listas:listar_listas')
