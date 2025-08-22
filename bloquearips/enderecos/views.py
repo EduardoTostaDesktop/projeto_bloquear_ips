@@ -68,14 +68,20 @@ def detectar_tipo(endereco):
 
 @allowed_roles(['admin', 'engredes'])
 def massa_enderecos(request):
-    if request.method == "POST":
-        ids = request.POST.getlist('ids')  # lista de ids selecionados
-        acao = request.POST.get('acao')    # 'bloquear' ou 'desbloquear'
+    if request.method == 'POST':
+        ids = request.POST.getlist('ids')
+        acao = request.POST.get('acao')
 
-        enderecos = Endereco.objects.filter(id__in=ids)
-        for endereco in enderecos:
-            endereco.status = True if acao == "bloquear" else False
-            endereco.save()
+        if ids:
+            if acao == 'bloquear':
+                Endereco.objects.filter(id__in=ids).update(status=True)
+            elif acao == 'desbloquear':
+                Endereco.objects.filter(id__in=ids).update(status=False)
+            elif acao == 'excluir':
+                Endereco.objects.filter(id__in=ids).delete()
+            messages.success(request, f'Ação "{acao}" realizada com sucesso!')
+        else:
+            messages.warning(request, "Nenhum endereço selecionado para ação.")
 
     return redirect('listar_enderecos')
 

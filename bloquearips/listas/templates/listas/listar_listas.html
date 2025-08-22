@@ -15,11 +15,20 @@
         </a>
     </div>
 
-    <!-- Tabela de listas -->
+<form id="listasForm" method="POST" action="{% url 'listas:excluir_listas_massa' %}">
+    {% csrf_token %}
     <div class="w-full md:w-3/4 overflow-x-auto shadow-lg rounded-xl">
+        <div class="mb-4 flex space-x-2">
+            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                Excluir Selecionadas
+            </button>
+        </div>
         <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full text-sm md:text-base">
             <thead class="bg-gray-600 text-white">
                 <tr>
+                    <th class="py-3 px-6">
+                        <input type="checkbox" id="selectAll" onclick="toggleAll(this)">
+                    </th>
                     <th class="py-3 px-6 text-left">Nome</th>
                     <th class="py-3 px-6 text-left">Solicitante</th>
                     <th class="py-3 px-6 text-left">Criador</th>
@@ -31,6 +40,9 @@
             <tbody>
                 {% for lista in listas %}
                 <tr class="border-b hover:bg-gray-100">
+                    <td class="py-3 px-6">
+                        <input type="checkbox" class="selectRow" name="ids" value="{{ lista.id }}">
+                    </td>
                     <td class="py-3 px-6">{{ lista.nome }}</td>
                     <td class="py-3 px-6">{{ lista.solicitante }}</td>
                     <td class="py-3 px-6">{{ lista.criador }}</td>
@@ -43,19 +55,20 @@
                         {% endif %}
                     </td>
                     <td class="py-3 px-6 flex space-x-2">
-                        <a href="{% url 'listas:detalhar_lista' lista.id %}"
-                           class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition">
-                           Detalhes
+                        <a href="{% url 'listas:detalhar_lista' lista.id %}" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition">
+                            Detalhes
                         </a>
-                        <a href="{% url 'listas:editar_lista' lista.id %}"
-                           class="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded-lg transition">
-                           Editar
+                        <a href="{% url 'listas:editar_lista' lista.id %}" class="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded-lg transition">
+                            Editar
                         </a>
+                        <button type="button" onclick="confirmDelete({{ lista.id }})" class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg">
+                            Excluir
+                        </button>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center py-6 text-gray-500 italic">
+                    <td colspan="7" class="text-center py-6 text-gray-500 italic">
                         Nenhuma lista cadastrada no momento.
                     </td>
                 </tr>
@@ -63,5 +76,19 @@
             </tbody>
         </table>
     </div>
+</form>
 </div>
+
+<script>
+function toggleAll(master) {
+    const checkboxes = document.querySelectorAll('.selectRow');
+    checkboxes.forEach(cb => cb.checked = master.checked);
+}
+
+function confirmDelete(listaId) {
+    if (confirm('Tem certeza que deseja excluir esta lista?')) {
+        window.location.href = `/listas/excluir/${listaId}/`;
+    }
+}
+</script>
 {% endblock %}

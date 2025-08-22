@@ -39,7 +39,7 @@
         <div>
             <span class="font-semibold">Endereços:</span>
             <ul class="list-disc list-inside border p-2 rounded">
-                {% for endereco in lista.endereco_set.all %}
+                {% for endereco in lista.enderecos.all %}
                     <li>{{ endereco.endereco }}</li>
                 {% empty %}
                     <li>Nenhum endereço cadastrado.</li>

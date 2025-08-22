@@ -1,9 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
-import csv
-
+import openpyxl
 from usuarios.decorators import allowed_roles
-
 from .models import Lista
 from enderecos.models import Endereco
 from solicitantes.models import Solicitante
@@ -55,25 +53,21 @@ def criar_lista(request):
             criador=criador,
             data_prevista_desbloqueio=data_prevista_desbloqueio
         )
-
         if arquivo:
-            decoded_file = arquivo.read().decode('utf-8').splitlines()
-            reader = csv.reader(decoded_file)
+            try:
+                # Carrega o workbook do Excel
+                wb = openpyxl.load_workbook(arquivo)
+                ws = wb.active  # pega a primeira aba
 
-            for i, row in enumerate(reader):
-                # Pula cabeçalho, se existir
-                if i == 0 and "endereco" in row[0].lower():
-                    continue
+                for row in ws.iter_rows(min_row=1, values_only=True):  # iter_rows retorna tuplas de valores
+                    if not row or not row[0]:
+                        continue
+                    endereco_text = str(row[0]).strip()
+                    if endereco_text and not Endereco.objects.filter(endereco=endereco_text, lista=lista).exists():
+                        Endereco.objects.create(endereco=endereco_text, lista=lista)
 
-                if not row or not row[0].strip():
-                    continue
-
-                endereco_text = row[0].strip()
-
-        # Evita duplicatas
-        if not Endereco.objects.filter(endereco=endereco_text, lista=lista).exists():
-            Endereco.objects.create(endereco=endereco_text, lista=lista)
-
+            except Exception as e:
+                messages.error(request, f"Erro ao processar o arquivo Excel: {e}")
 
         messages.success(request, "Lista criada com sucesso!")
         return redirect('listas:listar_listas')
@@ -100,3 +94,25 @@ def editar_lista(request, lista_id):
     # GET
     solicitantes = Solicitante.objects.all()
     return render(request, 'listas/editar_lista.html', {'lista': lista, 'solicitantes': solicitantes})
+
+@allowed_roles(['admin', 'engredes'])
+def excluir_lista(request, lista_id):
+    lista = get_object_or_404(Lista, id=lista_id)
+    lista.delete()
+    messages.success(request, f'Lista "{lista.nome}" excluída com sucesso!')
+    return redirect('listas:listar_listas')
+
+@allowed_roles(['admin', 'engredes'])
+def excluir_listas_massa(request):
+    if request.method == "POST":
+        ids = request.POST.getlist('ids')
+        if ids:
+            Lista.objects.filter(id__in=ids).delete()
+            messages.success(request, f"{len(ids)} lista(s) excluída(s) com sucesso!")
+        else:
+            messages.warning(request, "Nenhuma lista selecionada para exclusão.")
+    return redirect('listas:listar_listas')
+
+
+
+
