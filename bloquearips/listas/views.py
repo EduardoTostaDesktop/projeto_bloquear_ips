@@ -49,18 +49,23 @@ def criar_lista(request):
             criador=criador,
             data_prevista_desbloqueio=data_prevista_desbloqueio
         )
+
+        # Processa arquivo Excel **dentro do POST**
         if arquivo:
             try:
-                # Carrega o workbook do Excel
+                import openpyxl
                 wb = openpyxl.load_workbook(arquivo)
-                ws = wb.active  # pega a primeira aba
+                ws = wb.active
 
-                for row in ws.iter_rows(min_row=1, values_only=True):  # iter_rows retorna tuplas de valores
+                for row in ws.iter_rows(min_row=1, values_only=True):
                     if not row or not row[0]:
                         continue
                     endereco_text = str(row[0]).strip()
-                    if endereco_text and not Endereco.objects.filter(endereco=endereco_text, lista=lista).exists():
-                        Endereco.objects.create(endereco=endereco_text, lista=lista)
+                    if endereco_text:
+                        endereco_obj, created = Endereco.objects.get_or_create(
+                            endereco=endereco_text
+                        )
+                        lista.enderecos.add(endereco_obj)
 
             except Exception as e:
                 messages.error(request, f"Erro ao processar o arquivo Excel: {e}")

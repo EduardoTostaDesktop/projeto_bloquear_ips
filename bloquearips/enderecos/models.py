@@ -9,24 +9,14 @@ class Endereco(models.Model):
         ("url", "URL"),
     ]
 
-    # Este campo será atualizado quando criarmos o app 'listas'
-    lista = models.ForeignKey(
-        'listas.Lista',  # App futuro
-        on_delete=models.CASCADE,
-        related_name="enderecos",
-        null=True,
-        blank=True
-    )
-
     endereco = models.CharField(max_length=100, unique=True)
     tipo = models.CharField(max_length=10, choices=TIPOS, editable=False)
     status = models.BooleanField(default=False)  # False = desbloqueado, True = bloqueado
     nome = models.CharField(max_length=100, blank=True, null=True)
     desc = models.TextField(blank=True, null=True)
     obs = models.TextField(blank=True, null=True)
-
     data_criacao = models.DateTimeField(auto_now_add=True)
-    data_desbloqueio = models.DateField(blank=True, null=True)  # Novo campo
+    data_desbloqueio = models.DateField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         # Detectar tipo automaticamente
