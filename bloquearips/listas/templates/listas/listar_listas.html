@@ -8,20 +8,16 @@
 
     <h1 class="text-3xl font-bold mb-6">Listas Cadastradas</h1>
 
-    <!-- Botão criar lista -->
-    <div class="w-full md:w-3/4 flex justify-end mb-4">
-        <a href="{% url 'listas:criar_lista' %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition">
-            + Nova Lista
-        </a>
-    </div>
-
 <form id="listasForm" method="POST" action="{% url 'listas:excluir_listas_massa' %}">
     {% csrf_token %}
-    <div class="w-full md:w-3/4 overflow-x-auto shadow-lg rounded-xl">
-        <div class="mb-4 flex space-x-2">
+    <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full overflow-x-auto mx-auto">
+        <div class="mb-4 flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
             <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
                 Excluir Selecionadas
             </button>
+            <a href="{% url 'listas:criar_lista' %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition">
+            + Nova Lista
+        </a>
         </div>
         <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full text-sm md:text-base">
             <thead class="bg-gray-600 text-white">
@@ -43,7 +39,11 @@
                     <td class="py-3 px-6">
                         <input type="checkbox" class="selectRow" name="ids" value="{{ lista.id }}">
                     </td>
-                    <td class="py-3 px-6">{{ lista.nome }}</td>
+                    <td class="py-3 px-6">
+                        <a href="{% url 'listas:detalhar_lista' lista.id %}" class="text-blue-600 hover:underline">
+                            {{ lista.nome }}
+                        </a>
+                    </td>
                     <td class="py-3 px-6">{{ lista.solicitante }}</td>
                     <td class="py-3 px-6">{{ lista.criador }}</td>
                     <td class="py-3 px-6">{{ lista.data_registro|date:"d/m/Y H:i" }}</td>
@@ -55,9 +55,6 @@
                         {% endif %}
                     </td>
                     <td class="py-3 px-6 flex space-x-2">
-                        <a href="{% url 'listas:detalhar_lista' lista.id %}" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition">
-                            Detalhes
-                        </a>
                         <a href="{% url 'listas:editar_lista' lista.id %}" class="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded-lg transition">
                             Editar
                         </a>

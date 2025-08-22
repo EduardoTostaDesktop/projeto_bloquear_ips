@@ -1,13 +1,9 @@
+from pyexpat.errors import messages
 from django.shortcuts import render, get_object_or_404, redirect
 
 from usuarios.decorators import allowed_roles
 from .models import Solicitante
 from django.contrib.auth.decorators import login_required
-
-@allowed_roles(['admin', 'engredes'])
-def painel_solicitantes(request):
-    return render(request, 'solicitantes/painel_solicitantes.html')
-from django.contrib import messages
 
 @allowed_roles(['admin', 'engredes'])
 def listar_solicitantes(request):

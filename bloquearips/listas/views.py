@@ -7,10 +7,6 @@ from enderecos.models import Endereco
 from solicitantes.models import Solicitante
 
 @allowed_roles(['admin', 'engredes'])
-def painel_listas(request):
-    return render(request, 'listas/painel_listas.html')
-
-@allowed_roles(['admin', 'engredes'])
 def listar_listas(request):
     listas = Lista.objects.all().order_by('-data_registro')
     return render(request, 'listas/listar_listas.html', {'listas': listas})

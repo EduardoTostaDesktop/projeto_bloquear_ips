@@ -9,11 +9,6 @@ from enderecos.forms import EnderecoForm
 from enderecos.models import Endereco
 
 @login_required
-def painel_enderecos(request):
-    return render(request, "enderecos/painel_enderecos.html")
-
-
-@login_required
 def perfil_endereco(request, endereco_id):
     endereco = get_object_or_404(Endereco, id=endereco_id)
     return render(request, "enderecos/perfil_endereco.html", {"endereco": endereco})

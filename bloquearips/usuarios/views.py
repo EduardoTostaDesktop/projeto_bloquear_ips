@@ -4,11 +4,6 @@ from .models import Usuario
 from .forms import UsuarioCreateForm
 from .decorators import admin_required, engredes_required
 
-# Somente administradores podem acessar o painel de usuários
-@admin_required
-def painel_usuarios(request):
-    return render(request, 'usuarios/painel_usuarios.html')
-
 # Apenas administradores podem cadastrar usuários
 
 def cadastrar_usuario(request):
