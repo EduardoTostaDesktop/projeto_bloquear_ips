@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from listas.models import Lista
 from solicitantes.models import Solicitante
+from django.utils import timezone
 
 class Solicitacao(models.Model):
     TIPO_CHOICES = [
@@ -18,6 +19,7 @@ class Solicitacao(models.Model):
     lista = models.ForeignKey(Lista, on_delete=models.CASCADE, related_name='solicitacoes')
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='BLOQUEIO')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDENTE')
+    enderecos = models.ManyToManyField('enderecos.Endereco', blank=True, related_name='solicitacoes')
     data_prevista = models.DateTimeField(null=True, blank=True)
     data_execucao = models.DateTimeField(null=True, blank=True)
     desc = models.TextField(blank=True, null=True)

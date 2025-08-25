@@ -1,79 +1,71 @@
 {% extends 'base.html' %}
-{% block title %}Nova Solicitação{% endblock %}
+{% load static %}
+
+{% block title %}Criar Solicitação{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto py-10">
-    <h1 class="text-3xl font-bold mb-6">Criar Nova Solicitação</h1>
+<div class="container mx-auto py-10">
+    <h1 class="text-3xl font-bold mb-6">Criar Solicitação</h1>
 
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" class="space-y-6">
         {% csrf_token %}
-        <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 space-y-4">
 
-            <!-- Tipo de solicitação -->
-            <div>
-                <label class="block font-semibold mb-1">Tipo de Solicitação:</label>
-                <select name="tipo" class="border p-2 rounded w-full">
-                    <option value="BLOQUEIO">Bloqueio</option>
-                    <option value="DESBLOQUEIO">Desbloqueio</option>
-                </select>
-            </div>
+        <!-- Tipo de Solicitação -->
+        <div>
+            <label class="block font-semibold mb-1">Tipo</label>
+            <select name="tipo" class="border rounded px-3 py-2 w-full">
+                <option value="BLOQUEIO">Bloqueio</option>
+                <option value="DESBLOQUEIO">Desbloqueio</option>
+            </select>
+        </div>
 
-            <!-- Selecionar lista existente -->
-            <div>
-                <label class="block font-semibold mb-1">Lista existente:</label>
-                <select name="lista_existente" class="border p-2 rounded w-full">
-                    <option value="">-- Selecione uma lista --</option>
-                    {% for lista in listas %}
-                        <option value="{{ lista.id }}">{{ lista.nome }} ({{ lista.solicitante }})</option>
+        <!-- Solicitante -->
+        <div>
+            <label class="block font-semibold mb-1">Solicitante</label>
+            <div class="flex gap-2 items-center">
+                <select name="solicitante" class="border rounded px-3 py-2 flex-1">
+                    <option value="">-- Selecionar solicitante --</option>
+                    {% for s in solicitantes %}
+                        <option value="{{ s.id }}">{{ s.nome }}</option>
                     {% endfor %}
                 </select>
-                <p class="text-gray-500 text-sm mt-1">Escolha uma lista existente ou crie uma nova abaixo.</p>
-            </div>
-
-            <hr class="my-4">
-
-            <!-- Criar nova lista -->
-            <div>
-                <h2 class="font-semibold mb-2">Nova Lista (opcional)</h2>
-
-                <div class="mb-2">
-                    <label class="block mb-1">Nome da Lista:</label>
-                    <input type="text" name="nome_lista" class="border p-2 rounded w-full">
-                </div>
-
-                <div class="mb-2">
-                    <label class="block mb-1">Solicitante:</label>
-                    <select name="solicitante_lista" class="border p-2 rounded w-full">
-                        <option value="">-- Selecione um solicitante --</option>
-                        {% for s in solicitantes %}
-                            <option value="{{ s.id }}">{{ s.nome }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="mb-2">
-                    <label class="block mb-1">Descrição:</label>
-                    <textarea name="desc_lista" class="border p-2 rounded w-full"></textarea>
-                </div>
-
-                <div class="mb-2">
-                    <label class="block mb-1">Observações:</label>
-                    <textarea name="obs_lista" class="border p-2 rounded w-full"></textarea>
-                </div>
-
-                <div class="mb-2">
-                    <label class="block mb-1">Arquivo de endereços (Excel):</label>
-                    <input type="file" name="arquivo_csv" accept=".xlsx,.xls" class="border p-2 rounded w-full">
-                </div>
-            </div>
-
-            <!-- Botão enviar -->
-            <div class="flex justify-end">
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                    Criar Solicitação
-                </button>
+                <a href="{% url 'solicitantes:cadastrar_solicitante' %}" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Novo</a>
             </div>
         </div>
+
+        <!-- Lista existente ou arquivo -->
+        <div>
+            <label class="block font-semibold mb-1">Lista</label>
+            <div class="flex gap-2 items-center mb-2">
+                <select name="lista_existente" class="border rounded px-3 py-2 flex-1">
+                    <option value="">-- Selecionar lista existente --</option>
+                    {% for l in listas %}
+                        <option value="{{ l.id }}">{{ l.nome }} ({{ l.solicitante.nome }})</option>
+                    {% endfor %}
+                </select>
+                <a href="{% url 'listas:criar_lista' %}" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Nova</a>
+            </div>
+            <label class="block mb-1 text-sm text-gray-600">Ou envie um arquivo Excel para criar uma lista:</label>
+            <input type="file" name="arquivo_csv" accept=".xlsx,.xls" class="border rounded px-3 py-2 w-full">
+        </div>
+
+        <!-- Datas e observações -->
+        <div>
+            <label class="block font-semibold mb-1">Data Prevista para Desbloqueio</label>
+            <input type="datetime-local" name="data_prevista" class="border rounded px-3 py-2 w-full">
+        </div>
+
+        <div>
+            <label class="block font-semibold mb-1">Descrição</label>
+            <textarea name="desc" rows="3" class="border rounded px-3 py-2 w-full"></textarea>
+        </div>
+
+        <div>
+            <label class="block font-semibold mb-1">Observações</label>
+            <textarea name="obs" rows="3" class="border rounded px-3 py-2 w-full"></textarea>
+        </div>
+
+        <button type="submit" class="px-5 py-3 bg-green-600 text-white rounded hover:bg-green-700 font-semibold">Criar Solicitação</button>
     </form>
 </div>
 {% endblock %}
