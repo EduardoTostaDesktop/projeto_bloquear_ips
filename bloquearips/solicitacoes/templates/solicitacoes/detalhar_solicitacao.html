@@ -42,17 +42,24 @@
             {{ solicitacao.data_prevista|date:"d/m/Y"|default:"-" }}
         </div>
 
-
+        <!-- Lista de Endereços com tamanho fixo e barra de rolagem -->
         <div>
             <span class="font-semibold">Endereços:</span>
-            <ul class="list-disc list-inside border p-2 rounded">
-                {% for endereco in solicitacao.lista.enderecos.all %}
-                    <li>{{ endereco.endereco }} - {% if endereco.status %}Bloqueado{% else %}Desbloqueado{% endif %}</li>
-                {% empty %}
-                    <li>Nenhum endereço na lista.</li>
-                {% endfor %}
-
-            </ul>
+            <div class="border rounded p-2 max-h-48 overflow-y-auto bg-gray-50">
+                <ul class="list-disc list-inside">
+                    {% for endereco in solicitacao.lista.enderecos.all %}
+                        <li>{{ endereco.endereco }} - 
+                            {% if endereco.status %}
+                                <span class="text-red-600 font-semibold">Bloqueado</span>
+                            {% else %}
+                                <span class="text-green-600 font-semibold">Desbloqueado</span>
+                            {% endif %}
+                        </li>
+                    {% empty %}
+                        <li>Nenhum endereço na lista.</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
 
         <div class="flex justify-end">

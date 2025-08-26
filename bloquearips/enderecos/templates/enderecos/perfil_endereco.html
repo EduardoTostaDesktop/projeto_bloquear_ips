@@ -43,6 +43,24 @@
             </div>
         {% endif %}
 
+        {% if endereco.listas.exists %}
+            <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 space-y-4">
+                <h2 class="text-xl font-bold mb-2">Solicitações relacionadas</h2>
+                <ul class="list-disc list-inside">
+                    {% for lista in endereco.listas.all %}
+                        {% for solicitacao in lista.solicitacoes.all %}
+                            <li>
+                                <a href="{% url 'solicitacoes:detalhar_solicitacao' solicitacao.id %}" class="text-blue-600 hover:underline">
+                                    {{ solicitacao.nome }} {{ solicitacao.data_execucao|date:"d/m/Y" }} - {{ solicitacao.tipo }}
+                                </a>
+                            </li>
+                        {% empty %}
+                            <li>Nenhuma solicitação relacionada.</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
 
         {% if request.user.tipo != "noc" %}
             <div class="flex space-x-2 mt-4">

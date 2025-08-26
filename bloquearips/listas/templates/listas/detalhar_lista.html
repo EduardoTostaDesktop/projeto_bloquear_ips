@@ -8,7 +8,8 @@
 
     <h1 class="text-3xl font-bold mb-6">Detalhes da Lista: {{ lista.nome }}</h1>
 
-    <div class="w-full md:w-1/2 bg-white p-6 rounded shadow space-y-4">
+    <div class="w-full md:w-2/3 bg-white p-6 rounded shadow space-y-6">
+        <!-- Informações da Lista -->
         <div>
             <span class="font-semibold">Solicitante:</span> {{ lista.solicitante }}
         </div>
@@ -36,17 +37,50 @@
             {{ lista.data_prevista_desbloqueio|default:"-" }}
         </div>
 
+        <!-- Endereços -->
         <div>
-            <span class="font-semibold">Endereços:</span>
-            <ul class="list-disc list-inside border p-2 rounded">
-                {% for endereco in lista.enderecos.all %}
-                    <li>{{ endereco.endereco }}</li>
-                {% empty %}
-                    <li>Nenhum endereço cadastrado.</li>
-                {% endfor %}
-            </ul>
+            <span class="font-semibold text-lg">Endereços:</span>
+            <div class="border rounded p-3 max-h-64 overflow-y-auto bg-gray-50">
+                <ul class="list-disc list-inside space-y-1">
+                    {% for endereco in lista.enderecos.all %}
+                        <li>
+                            <span class="font-mono">{{ endereco.endereco }}</span>
+                            {% if endereco.status %}
+                                <span class="text-red-600 font-semibold">(Bloqueado)</span>
+                            {% else %}
+                                <span class="text-green-600 font-semibold">(Desbloqueado)</span>
+                            {% endif %}
+                        </li>
+                    {% empty %}
+                        <li>Nenhum endereço cadastrado.</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
 
+        <!-- Solicitações -->
+        <div>
+            <span class="font-semibold text-lg">Solicitações:</span>
+            <div class="border rounded p-3 max-h-64 overflow-y-auto bg-gray-50">
+                <ul class="list-disc list-inside space-y-2">
+                    {% for solicitacao in lista.solicitacoes.all %}
+                        <li>
+                            <div class="flex flex-col">
+                                <span><strong>Tipo:</strong> {{ solicitacao.tipo }}</span>
+                                <span><strong>Nome:</strong> {{ solicitacao.nome }}</span>
+                                <span><strong>Solicitante:</strong> {{ solicitacao.solicitante }}</span>
+                                <span><strong>Criado por:</strong> {{ solicitacao.criado_por }}</span>
+                                <span><strong>Data:</strong> {{ solicitacao.data_criacao|date:"d/m/Y H:i" }}</span>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li>Nenhuma solicitação cadastrada.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Botão Voltar -->
         <div class="flex justify-end">
             <a href="{% url 'listas:listar_listas' %}" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
                 Voltar
