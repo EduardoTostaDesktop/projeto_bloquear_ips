@@ -26,9 +26,9 @@
                         <th class="py-3 px-6">
                             <input type="checkbox" id="selectAll" onclick="toggleAll(this)">
                         </th>
+                        <th class="py-3 px-6 text-left">Nome</th>
                         <th class="py-3 px-6 text-left">Lista</th>
                         <th class="py-3 px-6 text-left">Tipo</th>
-                        <th class="py-3 px-6 text-left">Status</th>
                         <th class="py-3 px-6 text-left">Solicitante</th>
                         <th class="py-3 px-6 text-left">Criado Por</th>
                         <th class="py-3 px-6 text-left">Data Criação</th>
@@ -42,19 +42,20 @@
                             <input type="checkbox" class="selectRow" name="ids" value="{{ s.id }}">
                         </td>
                         <td class="py-3 px-6">
+                          <a href="{% url 'solicitacoes:detalhar_solicitacao' s.id %}" class="text-blue-600 hover:underline">
+                                {{ s.nome  }}
+                            </a>
+                        </td>
+                        <td class="py-3 px-6">
                             <a href="{% url 'listas:detalhar_lista' s.lista.id %}" class="text-blue-600 hover:underline">
                                 {{ s.lista.nome }}
                             </a>
                         </td>
                         <td class="py-3 px-6">{{ s.get_tipo_display }}</td>
-                        <td class="py-3 px-6">{{ s.get_status_display }}</td>
                         <td class="py-3 px-6">{{ s.solicitante }}</td>
                         <td class="py-3 px-6">{{ s.criado_por }}</td>
                         <td class="py-3 px-6">{{ s.data_criacao|date:"d/m/Y H:i" }}</td>
                         <td class="py-3 px-6 flex space-x-2">
-                            <a href="{% url 'solicitacoes:detalhar_solicitacao' s.id %}" class="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transition">
-                                Detalhar
-                            </a>
                             <button type="button" onclick="confirmDelete({{ s.id }})" class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg">
                                 Excluir
                             </button>

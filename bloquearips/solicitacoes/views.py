@@ -1,4 +1,5 @@
-import csv
+import openpyxl
+import datetime
 from io import TextIOWrapper
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
@@ -7,8 +8,6 @@ from .models import Solicitacao
 from listas.models import Lista
 from solicitantes.models import Solicitante
 from enderecos.models import Endereco
-from datetime import datetime
-import openpyxl
 
 
 @allowed_roles(['admin', 'engredes'])
@@ -37,63 +36,77 @@ def criar_solicitacao(request):
         solicitante_id = request.POST.get("solicitante")
         lista_existente_id = request.POST.get("lista_existente")
         nome_lista = request.POST.get("nome_lista")
-        arquivo = request.FILES.get("arquivo")
-        usuario = request.user
+        enderecos_ids = request.POST.getlist("enderecos")
+        data_prevista = request.POST.get("data_prevista")
         desc = request.POST.get("desc")
         obs = request.POST.get("obs")
-        data_prevista = request.POST.get("data_prevista") or None
+        arquivo = request.FILES.get("arquivo")
 
-        # Valida solicitante
-        if not solicitante_id:
-            messages.error(request, "Selecione um solicitante.")
-            return redirect("solicitacoes:criar_solicitacao")
         solicitante = get_object_or_404(Solicitante, id=solicitante_id)
 
-        # Seleciona ou cria lista
+        # Cria ou pega a lista
         if lista_existente_id:
             lista = get_object_or_404(Lista, id=lista_existente_id)
         else:
             if not nome_lista:
-                messages.error(request, "Digite um nome para a nova lista.")
+                messages.error(request, "Você deve informar um nome para a nova lista.")
                 return redirect("solicitacoes:criar_solicitacao")
+
             lista = Lista.objects.create(
                 nome=nome_lista,
                 solicitante=solicitante,
-                criado_por=usuario
+                criador=request.user
             )
-            # Processa arquivo Excel/CSV se houver
-            if arquivo:
-                try:
-                    import csv
-                    from io import TextIOWrapper
-                    csv_file = TextIOWrapper(arquivo.file, encoding="utf-8")
-                    reader = csv.reader(csv_file)
-                    for row in reader:
-                        endereco_texto = row[0].strip()
-                        if endereco_texto:
-                            endereco_obj, created = Endereco.objects.get_or_create(endereco=endereco_texto)
-                            lista.enderecos.add(endereco_obj)
-                except Exception as e:
-                    messages.warning(request, f"Erro ao processar o arquivo: {e}")
 
-        # Bloqueia ou desbloqueia todos os endereços da lista
-        if tipo == "BLOQUEIO":
-            lista.enderecos.update(status=True)
-        elif tipo == "DESBLOQUEIO":
-            lista.enderecos.update(status=False)
+        # Lista de endereços que serão afetados nesta solicitação
+        enderecos_solicitacao = []
+
+        # Adiciona endereços selecionados manualmente
+        if enderecos_ids:
+            enderecos_selecionados = Endereco.objects.filter(id__in=enderecos_ids)
+            lista.enderecos.add(*enderecos_selecionados)
+            enderecos_solicitacao.extend(enderecos_selecionados)
+
+        # Processa arquivo xlsx de endereços, se enviado
+        if arquivo:
+            try:
+                wb = openpyxl.load_workbook(arquivo)
+                sheet = wb.active
+                for row in sheet.iter_rows(values_only=True):
+                    endereco_texto = str(row[0]).strip()
+                    if endereco_texto:
+                        endereco_obj, created = Endereco.objects.get_or_create(endereco=endereco_texto)
+                        lista.enderecos.add(endereco_obj)
+                        enderecos_solicitacao.append(endereco_obj)
+            except Exception as e:
+                messages.error(request, f"Erro ao processar o arquivo: {e}")
+                return redirect("solicitacoes:criar_solicitacao")
+
+        # Gera o nome da solicitação
+        data_str = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+        nome_solicitacao = f"{solicitante.nome} - {lista.nome} - {data_str}"
 
         # Cria a solicitação
-        Solicitacao.objects.create(
+        solicitacao = Solicitacao.objects.create(
             lista=lista,
             tipo=tipo,
             solicitante=solicitante,
-            data_prevista=data_prevista,
+            data_prevista=data_prevista if data_prevista else None,
             desc=desc,
             obs=obs,
-            criado_por=usuario
+            criado_por=request.user,
+            nome=nome_solicitacao
         )
 
-        messages.success(request, "Solicitação criada e endereços atualizados com sucesso!")
+        # Atualiza o status apenas dos endereços afetados
+        # Atualiza o status apenas dos endereços afetados
+        novo_status = True if tipo == "BLOQUEIO" else False
+        for endereco in enderecos_solicitacao:
+            endereco.status = novo_status
+            endereco.save()
+
+
+        messages.success(request, "Solicitação criada com sucesso!")
         return redirect("solicitacoes:listar_solicitacoes")
 
     # GET
