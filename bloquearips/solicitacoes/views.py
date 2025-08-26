@@ -101,7 +101,7 @@ def criar_solicitacao(request):
         # Atualiza o status apenas dos endereços afetados
         # Atualiza o status apenas dos endereços afetados
         novo_status = True if tipo == "BLOQUEIO" else False
-        for endereco in enderecos_solicitacao:
+        for endereco in lista.enderecos.all():
             endereco.status = novo_status
             endereco.save()
 
