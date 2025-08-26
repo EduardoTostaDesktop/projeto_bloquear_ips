@@ -1,6 +1,5 @@
 import openpyxl
 import datetime
-from io import TextIOWrapper
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from usuarios.decorators import allowed_roles
@@ -52,10 +51,19 @@ def criar_solicitacao(request):
                 messages.error(request, "Você deve informar um nome para a nova lista.")
                 return redirect("solicitacoes:criar_solicitacao")
 
+            data_prevista = request.POST.get("data_prevista")
+            if data_prevista:
+                # Converte para datetime às 00:00 do dia selecionado
+                data_prevista_obj = datetime.strptime(data_prevista, "%Y-%m-%d")
+            else:
+                data_prevista_obj = None
+
+            # Criando nova lista
             lista = Lista.objects.create(
                 nome=nome_lista,
                 solicitante=solicitante,
-                criador=request.user
+                criador=request.user,
+                data_prevista_desbloqueio=data_prevista_obj
             )
 
         # Lista de endereços que serão afetados nesta solicitação
