@@ -110,6 +110,11 @@ def criar_solicitacao(request):
         novo_status = True if tipo == "BLOQUEIO" else False
         for endereco in lista.enderecos.all():
             endereco.status = novo_status
+            if data_prevista:
+                data_prevista_obj = datetime.strptime(data_prevista, "%Y-%m-%d")
+            else:
+                data_prevista_obj = None
+            endereco.data_desbloqueio = data_prevista_obj if data_prevista else None
             endereco.save()
 
 
