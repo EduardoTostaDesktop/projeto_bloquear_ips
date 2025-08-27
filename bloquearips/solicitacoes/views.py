@@ -1,5 +1,5 @@
 import openpyxl
-import datetime
+from datetime import datetime
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from usuarios.decorators import allowed_roles
@@ -91,7 +91,7 @@ def criar_solicitacao(request):
                 return redirect("solicitacoes:criar_solicitacao")
 
         # Gera o nome da solicitação
-        data_str = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+        data_str = datetime.now().strftime("%d/%m/%Y %H:%M")
         nome_solicitacao = f"{solicitante.nome} - {lista.nome} - {data_str}"
 
         # Cria a solicitação
