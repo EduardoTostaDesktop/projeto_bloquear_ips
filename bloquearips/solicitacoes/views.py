@@ -24,6 +24,7 @@ def detalhar_solicitacao(request, solicitacao_id):
         'solicitacao': solicitacao
     })
 
+
 @allowed_roles(['admin', 'engredes'])
 def criar_solicitacao(request):
     solicitantes = Solicitante.objects.all()
@@ -43,22 +44,24 @@ def criar_solicitacao(request):
 
         solicitante = get_object_or_404(Solicitante, id=solicitante_id)
 
-        # Cria ou pega a lista
+        # Converte data prevista, se informada
+        data_prevista_obj = datetime.strptime(data_prevista, "%Y-%m-%d") if data_prevista else None
+
+        # --- Verifica se o usuário selecionou uma lista existente ou criou uma nova ---
         if lista_existente_id:
             lista = get_object_or_404(Lista, id=lista_existente_id)
+
+            # Verificação: não permitir bloquear uma lista já bloqueada
+            if tipo == "BLOQUEIO" and lista.enderecos.filter(status=True).exists():
+                messages.error(request, f"A lista '{lista.nome}' já está bloqueada e não pode ser bloqueada novamente.")
+                return redirect("solicitacoes:criar_solicitacao")
+
         else:
+            # Criando nova lista
             if not nome_lista:
                 messages.error(request, "Você deve informar um nome para a nova lista.")
                 return redirect("solicitacoes:criar_solicitacao")
 
-            data_prevista = request.POST.get("data_prevista")
-            if data_prevista:
-                # Converte para datetime às 00:00 do dia selecionado
-                data_prevista_obj = datetime.strptime(data_prevista, "%Y-%m-%d")
-            else:
-                data_prevista_obj = None
-
-            # Criando nova lista
             lista = Lista.objects.create(
                 nome=nome_lista,
                 solicitante=solicitante,
@@ -66,7 +69,7 @@ def criar_solicitacao(request):
                 data_prevista_desbloqueio=data_prevista_obj
             )
 
-        # Lista de endereços que serão afetados nesta solicitação
+        # --- Monta os endereços que farão parte da solicitação ---
         enderecos_solicitacao = []
 
         # Adiciona endereços selecionados manualmente
@@ -75,7 +78,7 @@ def criar_solicitacao(request):
             lista.enderecos.add(*enderecos_selecionados)
             enderecos_solicitacao.extend(enderecos_selecionados)
 
-        # Processa arquivo xlsx de endereços, se enviado
+        # Processa arquivo XLSX, se enviado
         if arquivo:
             try:
                 wb = openpyxl.load_workbook(arquivo)
@@ -83,7 +86,7 @@ def criar_solicitacao(request):
                 for row in sheet.iter_rows(values_only=True):
                     endereco_texto = str(row[0]).strip()
                     if endereco_texto:
-                        endereco_obj, created = Endereco.objects.get_or_create(endereco=endereco_texto)
+                        endereco_obj, _ = Endereco.objects.get_or_create(endereco=endereco_texto)
                         lista.enderecos.add(endereco_obj)
                         enderecos_solicitacao.append(endereco_obj)
             except Exception as e:
@@ -99,7 +102,7 @@ def criar_solicitacao(request):
             lista=lista,
             tipo=tipo,
             solicitante=solicitante,
-            data_prevista=data_prevista if data_prevista else None,
+            data_prevista=data_prevista_obj,
             desc=desc,
             obs=obs,
             criado_por=request.user,
@@ -110,13 +113,8 @@ def criar_solicitacao(request):
         novo_status = True if tipo == "BLOQUEIO" else False
         for endereco in lista.enderecos.all():
             endereco.status = novo_status
-            if data_prevista:
-                data_prevista_obj = datetime.strptime(data_prevista, "%Y-%m-%d")
-            else:
-                data_prevista_obj = None
-            endereco.data_desbloqueio = data_prevista_obj if data_prevista else None
+            endereco.data_desbloqueio = data_prevista_obj if tipo == "BLOQUEIO" else None
             endereco.save()
-
 
         messages.success(request, "Solicitação criada com sucesso!")
         return redirect("solicitacoes:listar_solicitacoes")
@@ -127,6 +125,7 @@ def criar_solicitacao(request):
         "listas": listas,
         "enderecos": enderecos
     })
+
 
 
 @allowed_roles(['admin', 'engredes'])
