@@ -1,5 +1,6 @@
 import openpyxl
 from datetime import datetime
+from django.utils import timezone
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from usuarios.decorators import allowed_roles
@@ -44,20 +45,13 @@ def criar_solicitacao(request):
 
         solicitante = get_object_or_404(Solicitante, id=solicitante_id)
 
-        # Converte data prevista, se informada
-        data_prevista_obj = datetime.strptime(data_prevista, "%Y-%m-%d") if data_prevista else None
+        # Converte data prevista para timezone-aware
+        data_prevista_obj = timezone.make_aware(datetime.strptime(data_prevista, "%Y-%m-%d")) if data_prevista else None
 
-        # --- Verifica se o usuário selecionou uma lista existente ou criou uma nova ---
+        # --- Seleciona lista existente ou cria nova ---
         if lista_existente_id:
             lista = get_object_or_404(Lista, id=lista_existente_id)
-
-            # Verificação: não permitir bloquear uma lista já bloqueada
-            if tipo == "BLOQUEIO" and lista.enderecos.filter(status=True).exists():
-                messages.error(request, f"A lista '{lista.nome}' já está bloqueada e não pode ser bloqueada novamente.")
-                return redirect("solicitacoes:criar_solicitacao")
-
         else:
-            # Criando nova lista
             if not nome_lista:
                 messages.error(request, "Você deve informar um nome para a nova lista.")
                 return redirect("solicitacoes:criar_solicitacao")
@@ -93,6 +87,14 @@ def criar_solicitacao(request):
                 messages.error(request, f"Erro ao processar o arquivo: {e}")
                 return redirect("solicitacoes:criar_solicitacao")
 
+        # Se nenhum endereço foi enviado manualmente ou via arquivo, usa os já existentes da lista
+        if not enderecos_solicitacao and lista.enderecos.exists():
+            enderecos_solicitacao = list(lista.enderecos.all())
+
+        if not enderecos_solicitacao:
+            messages.error(request, "Nenhum endereço válido foi selecionado ou encontrado.")
+            return redirect("solicitacoes:criar_solicitacao")
+
         # Gera o nome da solicitação
         data_str = datetime.now().strftime("%d/%m/%Y %H:%M")
         nome_solicitacao = f"{solicitante.nome} - {lista.nome} - {data_str}"
@@ -109,14 +111,28 @@ def criar_solicitacao(request):
             nome=nome_solicitacao
         )
 
-        # Atualiza o status apenas dos endereços afetados
-        novo_status = True if tipo == "BLOQUEIO" else False
-        for endereco in lista.enderecos.all():
-            endereco.status = novo_status
-            endereco.data_desbloqueio = data_prevista_obj if tipo == "BLOQUEIO" else None
-            endereco.save()
+        # --- Atualiza apenas os endereços que precisam de alteração ---
+        novo_status = tipo == "BLOQUEIO"
+        alterados = 0
 
-        messages.success(request, "Solicitação criada com sucesso!")
+        for endereco in enderecos_solicitacao:
+            if endereco.status != novo_status:
+                endereco.status = novo_status
+                endereco.data_desbloqueio = data_prevista_obj if novo_status else None
+                endereco.save()
+                alterados += 1
+
+        if alterados:
+            messages.success(
+                request,
+                f"{alterados} endereço(s) {'bloqueado(s)' if novo_status else 'desbloqueado(s)'} com sucesso!"
+            )
+        else:
+            messages.warning(
+                request,
+                f"Todos os endereços selecionados já estavam {'bloqueados' if novo_status else 'desbloqueados'}."
+            )
+
         return redirect("solicitacoes:listar_solicitacoes")
 
     # GET
@@ -125,7 +141,6 @@ def criar_solicitacao(request):
         "listas": listas,
         "enderecos": enderecos
     })
-
 
 
 @allowed_roles(['admin', 'engredes'])
