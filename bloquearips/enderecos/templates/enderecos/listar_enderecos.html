@@ -16,6 +16,7 @@
                 placeholder="Buscar por endereço, nome ou descrição" 
                 class="p-2 appearance-none outline-none w-full text-gray-800"
                 id="searchInput"
+                oninput="filterTable()"  Adicione esta linha
             >
             <div class="text-gray-300 w-8 py-1 pl-2 pr-1 border-l flex items-center border-gray-200">
                 <button class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none" onclick="filterTable()">
