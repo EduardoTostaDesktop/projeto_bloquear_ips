@@ -46,7 +46,9 @@
 
 <form id="massaForm" method="POST" action="{% url 'massa_enderecos' %}">
     {% csrf_token %}
-    <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full mb-4 mx-auto flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
+    <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full mb-4 mx-auto flex flex-col sm:flex-row sm:justify-center sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">
+
+
         <button type="submit" name="acao" value="bloquear" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
             Bloquear
         </button>
