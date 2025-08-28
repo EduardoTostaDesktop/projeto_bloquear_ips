@@ -15,9 +15,17 @@
         </div>
 
         <div>
-            <span class="font-semibold">Lista Associada:</span> 
-            {{ solicitacao.lista.nome|default:"-" }}
+            <span class="font-semibold">Lista Associada:</span>
+            {% if solicitacao.lista %}
+                <a href="{% url 'listas:detalhar_lista' solicitacao.lista.id %}" 
+                class="text-blue-600 hover:underline">
+                    {{ solicitacao.lista.nome }}
+                </a>
+            {% else %}
+                -
+            {% endif %}
         </div>
+
 
         <div>
             <span class="font-semibold">Descrição:</span>

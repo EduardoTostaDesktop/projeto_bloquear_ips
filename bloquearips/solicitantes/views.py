@@ -12,7 +12,12 @@ def listar_solicitantes(request):
 @allowed_roles(['admin', 'engredes'])
 def detalhar_solicitante(request, solicitante_id):
     solicitante = get_object_or_404(Solicitante, id=solicitante_id)
-    return render(request, 'solicitantes/detalhar_solicitante.html', {'solicitante': solicitante})
+    solicitacoes = solicitante.solicitacao_set.all()  # <-- AQUI ESTÁ O AJUSTE
+
+    return render(request, "solicitantes/detalhar_solicitante.html", {
+        "solicitante": solicitante,
+        "solicitacoes": solicitacoes,
+    })
 
 @allowed_roles(['admin', 'engredes'])
 def cadastrar_solicitante(request):

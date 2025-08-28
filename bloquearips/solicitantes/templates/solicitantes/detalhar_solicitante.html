@@ -1,13 +1,78 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Detalhes do Solicitante{% endblock %}
 
 {% block content %}
-<h1 class="text-3xl font-bold mb-4">{{ solicitante.nome }}</h1>
+<div class="container mx-auto py-10 flex flex-col items-center">
 
-<p><strong>Contato:</strong> {{ solicitante.contato }}</p>
-<p><strong>Observações:</strong> {{ solicitante.obs|default:"-" }}</p>
+    <!-- Título -->
+    <h1 class="text-3xl font-bold mb-6">Detalhes do Solicitante: {{ solicitante.nome }}</h1>
 
-<a href="{% url 'solicitantes:editar_solicitante' solicitante.id %}" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 mt-4 inline-block">Editar</a>
-<a href="{% url 'solicitantes:listar_solicitantes' %}" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 mt-4 inline-block">Voltar</a>
+    <div class="w-full md:w-2/3 bg-white p-6 rounded shadow space-y-6">
+
+        <!-- Informações do solicitante -->
+        <div>
+            <span class="font-semibold">Nome:</span> {{ solicitante.nome }}
+        </div>
+        <div>
+            <span class="font-semibold">Contato:</span> {{ solicitante.contato|default:"-" }}
+        </div>
+        <div>
+            <span class="font-semibold">Observações:</span>
+            <p class="border p-2 rounded bg-gray-50">{{ solicitante.obs|default:"-" }}</p>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Solicitações associadas -->
+        <h2 class="text-2xl font-bold mb-4">Solicitações Associadas</h2>
+
+        {% if solicitacoes %}
+            <div class="border rounded max-h-80 overflow-y-auto bg-gray-50">
+                <table class="min-w-full border-collapse">
+                    <thead>
+                        <tr class="bg-gray-200 text-left">
+                            <th class="border px-4 py-2">Nome</th>
+                            <th class="border px-4 py-2">Tipo</th>
+                            <th class="border px-4 py-2">Lista</th>
+                            <th class="border px-4 py-2">Data Prevista</th>
+                            <th class="border px-4 py-2">Criado em</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for solicitacao in solicitacoes %}
+                            <tr class="hover:bg-gray-100 transition">
+                                <td class="border px-4 py-2">
+                                    <a href="{% url 'solicitacoes:detalhar_solicitacao' solicitacao.id %}" class="text-blue-600 hover:underline">
+                                        {{ solicitacao.nome }}
+                                    </a>
+                                </td>
+                                <td class="border px-4 py-2">{{ solicitacao.tipo }}</td>
+                                <td class="border px-4 py-2">{{ solicitacao.lista.nome }}</td>
+                                <td class="border px-4 py-2">{{ solicitacao.data_prevista|date:"d/m/Y H:i"|default:"-" }}</td>
+                                <td class="border px-4 py-2">{{ solicitacao.data_criacao|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-gray-600">Nenhuma solicitação encontrada para este solicitante.</p>
+        {% endif %}
+
+        <!-- Botões -->
+        <div class="flex justify-end space-x-4 mt-6">
+            <a href="{% url 'solicitantes:editar_solicitante' solicitante.id %}"
+               class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                Editar
+            </a>
+            <a href="{% url 'solicitantes:listar_solicitantes' %}"
+               class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                Voltar
+            </a>
+        </div>
+    </div>
+
+</div>
 {% endblock %}
