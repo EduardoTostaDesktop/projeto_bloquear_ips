@@ -41,11 +41,7 @@
             <option value="desbloqueado">Desbloqueado</option>
         </select>
     </div>
-
-<form id="massaForm" method="POST" action="{% url 'massa_enderecos' %}">
-    {% csrf_token %}
-    <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full overflow-x-auto mx-auto">
-        <div class="mb-4 flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
+    <div class="mb-4 flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
             <button type="submit" name="acao" value="bloquear" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
                 Bloquear
             </button>
@@ -60,55 +56,57 @@
             </a>
         </div>
 
-    <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full">
-        <thead class="bg-gray-600 text-white text-sm sm:text-base">
-            <tr>
-                <th class="py-3 px-3 sm:px-6">
-                    <input type="checkbox" id="selectAll" onclick="toggleAll(this)">
-                </th>
-                <th class="py-3 px-3 sm:px-6 text-left">Endereço</th>
-                <th class="py-3 px-3 sm:px-6 text-left">Tipo</th>
-                <th class="py-3 px-3 sm:px-6 text-left hidden sm:table-cell">Nome</th>
-                <th class="py-3 px-3 sm:px-6 text-left hidden md:table-cell">Descrição</th>
-                <th class="py-3 px-3 sm:px-6 text-left hidden lg:table-cell">Observação</th>
-                <th class="py-3 px-3 sm:px-6 text-center">Status</th>
-                {% if request.user.tipo != "noc" %}
-                <th class="py-3 px-3 sm:px-6 text-center">Ações</th>
-                {% endif %}
-            </tr>
-        </thead>
-        <tbody id="enderecosTable" class="text-sm sm:text-base">
-            {% for endereco in enderecos %}
-            <tr class="border-b hover:bg-gray-100">
-                <td class="py-2 px-3 sm:px-6">
-                    <input type="checkbox" class="selectRow" name="ids" value="{{ endereco.id }}">
-                </td>
-                <td class="py-2 px-3 sm:px-6 text-blue-600 hover:underline truncate max-w-[120px] sm:max-w-none">
-                    <a href="{% url 'perfil_endereco' endereco.id %}">{{ endereco.endereco|default_if_none:""|truncatechars:15 }}</a>
-                </td>
-                <td class="py-2 px-3 sm:px-6">{{ endereco.tipo|upper }}</td>
-                <td class="py-2 px-3 sm:px-6 hidden sm:table-cell truncate max-w-[100px]" title="{{ endereco.nome }}">{{ endereco.nome|default_if_none:""|truncatechars:15 }}</td>
-                <td class="py-2 px-3 sm:px-6 hidden md:table-cell truncate max-w-[150px]" title="{{ endereco.desc }}">{{ endereco.desc|default_if_none:""|truncatechars:20 }}</td>
-                <td class="py-2 px-3 sm:px-6 hidden lg:table-cell truncate max-w-[150px]" title="{{ endereco.obs }}">{{ endereco.obs|default_if_none:""|truncatechars:20 }}</td>
-                <td class="py-2 px-3 sm:px-6 text-center">
-                    {% if endereco.status %}
-                        <span class="text-red-600 font-bold">Bloqueado</span>
-                    {% else %}
-                        <span class="text-green-600 font-bold">Desbloqueado</span>
+<form id="massaForm" method="POST" action="{% url 'massa_enderecos' %}">
+    {% csrf_token %}
+    <div class="min-w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full overflow-x-auto overflow-y-auto max-h-128 mx-auto rounded-lg border border-gray-200">
+        <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full">
+            <thead class="bg-gray-600 text-white text-sm sm:text-base">
+                <tr>
+                    <th class="py-3 px-3 sm:px-6">
+                        <input type="checkbox" id="selectAll" onclick="toggleAll(this)">
+                    </th>
+                    <th class="py-3 px-3 sm:px-6 text-left">Endereço</th>
+                    <th class="py-3 px-3 sm:px-6 text-left">Tipo</th>
+                    <th class="py-3 px-3 sm:px-6 text-left hidden sm:table-cell">Nome</th>
+                    <th class="py-3 px-3 sm:px-6 text-left hidden md:table-cell">Descrição</th>
+                    <th class="py-3 px-3 sm:px-6 text-left hidden lg:table-cell">Observação</th>
+                    <th class="py-3 px-3 sm:px-6 text-center">Status</th>
+                    {% if request.user.tipo != "noc" %}
+                    <th class="py-3 px-3 sm:px-6 text-center">Ações</th>
                     {% endif %}
-                </td>
-                {% if request.user.tipo != "noc" %}
-                <td class="py-2 px-3 sm:px-6 text-center flex justify-center items-center space-x-1 sm:space-x-2">
-                    <a href="{% url 'editar_endereco' endereco.id %}" class="px-2 sm:px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded text-xs sm:text-sm">Editar</a>
-                    <button type="button" onclick="confirmDelete({{ endereco.id }})" class="px-2 sm:px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs sm:text-sm">Excluir</button>
-                </td>
-                {% endif %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
+                </tr>
+            </thead>
+            <tbody id="enderecosTable" class="text-sm sm:text-base">
+                {% for endereco in enderecos %}
+                <tr class="border-b hover:bg-gray-100">
+                    <td class="py-2 px-3 sm:px-6">
+                        <input type="checkbox" class="selectRow" name="ids" value="{{ endereco.id }}">
+                    </td>
+                    <td class="py-2 px-3 sm:px-6 text-blue-600 hover:underline truncate max-w-[120px] sm:max-w-none">
+                        <a href="{% url 'perfil_endereco' endereco.id %}">{{ endereco.endereco|default_if_none:""|truncatechars:15 }}</a>
+                    </td>
+                    <td class="py-2 px-3 sm:px-6">{{ endereco.tipo|upper }}</td>
+                    <td class="py-2 px-3 sm:px-6 hidden sm:table-cell truncate max-w-[100px]" title="{{ endereco.nome }}">{{ endereco.nome|default_if_none:""|truncatechars:15 }}</td>
+                    <td class="py-2 px-3 sm:px-6 hidden md:table-cell truncate max-w-[150px]" title="{{ endereco.desc }}">{{ endereco.desc|default_if_none:""|truncatechars:20 }}</td>
+                    <td class="py-2 px-3 sm:px-6 hidden lg:table-cell truncate max-w-[150px]" title="{{ endereco.obs }}">{{ endereco.obs|default_if_none:""|truncatechars:20 }}</td>
+                    <td class="py-2 px-3 sm:px-6 text-center">
+                        {% if endereco.status %}
+                            <span class="text-red-600 font-bold">Bloqueado</span>
+                        {% else %}
+                            <span class="text-green-600 font-bold">Desbloqueado</span>
+                        {% endif %}
+                    </td>
+                    {% if request.user.tipo != "noc" %}
+                    <td class="py-2 px-3 sm:px-6 text-center flex justify-center items-center space-x-1 sm:space-x-2">
+                        <a href="{% url 'editar_endereco' endereco.id %}" class="px-2 sm:px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded text-xs sm:text-sm">Editar</a>
+                        <button type="button" onclick="confirmDelete({{ endereco.id }})" class="px-2 sm:px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs sm:text-sm">Excluir</button>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </form>
 
 <script>
