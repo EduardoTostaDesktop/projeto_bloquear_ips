@@ -1,5 +1,5 @@
-from django.shortcuts import redirect
 from functools import wraps
+from django.http import HttpResponseForbidden
 
 # Decorator genérico para permitir apenas certos tipos
 def allowed_roles(roles=[]):
@@ -8,7 +8,8 @@ def allowed_roles(roles=[]):
         def wrapper(request, *args, **kwargs):
             if request.user.is_authenticated and request.user.tipo in roles:
                 return view_func(request, *args, **kwargs)
-            return redirect("home")
+            # Não faz nada: retorna 403 ou apenas ignora
+            return HttpResponseForbidden("Acesso negado")  # ou apenas 'pass' se quiser silencioso
         return wrapper
     return decorator
 
