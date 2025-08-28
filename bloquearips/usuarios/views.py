@@ -6,6 +6,7 @@ from .decorators import admin_required, engredes_required
 
 # Apenas administradores podem cadastrar usuários
 
+@admin_required
 def cadastrar_usuario(request):
     if request.method == "POST":
         form = UsuarioCreateForm(request.POST)

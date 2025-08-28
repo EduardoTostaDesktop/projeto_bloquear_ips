@@ -41,23 +41,24 @@
             <option value="desbloqueado">Desbloqueado</option>
         </select>
     </div>
-    <div class="mb-4 flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
-            <button type="submit" name="acao" value="bloquear" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-                Bloquear
-            </button>
-            <button type="submit" name="acao" value="desbloquear" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                Desbloquear
-            </button>
-            <button type="submit" name="acao" value="excluir" class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800">
-                Excluir Selecionados
-            </button>
-            <a href="{% url 'cadastrar_endereco' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-                Cadastrar
-            </a>
-        </div>
+
 
 <form id="massaForm" method="POST" action="{% url 'massa_enderecos' %}">
     {% csrf_token %}
+    <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full mb-4 mx-auto flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
+        <button type="submit" name="acao" value="bloquear" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+            Bloquear
+        </button>
+        <button type="submit" name="acao" value="desbloquear" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+            Desbloquear
+        </button>
+        <button type="submit" name="acao" value="excluir" class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800">
+            Excluir Selecionados
+        </button>
+        <a href="{% url 'cadastrar_endereco' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+            Cadastrar
+        </a>
+        </div>
     <div class="min-w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full overflow-x-auto overflow-y-auto max-h-128 mx-auto rounded-lg border border-gray-200">
         <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full">
             <thead class="bg-gray-600 text-white text-sm sm:text-base">
