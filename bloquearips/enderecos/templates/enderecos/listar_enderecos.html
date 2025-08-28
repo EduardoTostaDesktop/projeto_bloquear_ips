@@ -124,25 +124,26 @@ function confirmDelete(enderecoId) {
 
 function filterTable() {
     const input = document.getElementById('searchInput').value.toLowerCase();
-    const tipo = document.getElementById('tipoFilter').value;
-    const status = document.getElementById('statusFilter').value;
+    const tipo = document.getElementById('tipoFilter').value.toLowerCase();
+    const status = document.getElementById('statusFilter').value.toLowerCase();
     const rows = document.querySelectorAll('#enderecosTable tr');
 
     rows.forEach(row => {
         const enderecoText = row.cells[1]?.textContent.toLowerCase() || '';
-        const tipoText = row.cells[2]?.textContent || '';
+        const tipoText = row.cells[2]?.textContent.toLowerCase() || '';
         const nomeText = row.cells[3]?.textContent.toLowerCase() || '';
         const descText = row.cells[4]?.textContent.toLowerCase() || '';
         const obsText = row.cells[5]?.textContent.toLowerCase() || '';
         const statusText = row.cells[6]?.textContent.toLowerCase() || '';
 
         const matchesText = enderecoText.includes(input) || nomeText.includes(input) || descText.includes(input) || obsText.includes(input);
-        const matchesTipo = tipo === "" || tipoText === tipo.toUpperCase();
-        const matchesStatus = status === "" || statusText === status;
+        const matchesTipo = tipo === "" || tipoText === tipo;
+        const matchesStatus = status === "" || statusText.includes(status);
 
         row.style.display = (matchesText && matchesTipo && matchesStatus) ? '' : 'none';
     });
 }
+
 </script>
 
 {% endblock %}
