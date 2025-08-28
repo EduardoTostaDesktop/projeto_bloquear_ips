@@ -232,6 +232,9 @@
   .static {
     position: static;
   }
+  .sticky {
+    position: sticky;
+  }
   .inset-0 {
     inset: calc(var(--spacing) * 0);
   }
@@ -246,6 +249,9 @@
   }
   .right-5 {
     right: calc(var(--spacing) * 5);
+  }
+  .z-20 {
+    z-index: 20;
   }
   .z-50 {
     z-index: 50;
@@ -346,8 +352,8 @@
   .max-h-64 {
     max-height: calc(var(--spacing) * 64);
   }
-  .max-h-128 {
-    max-height: calc(var(--spacing) * 128);
+  .max-h-\[500px\] {
+    max-height: 500px;
   }
   .min-h-screen {
     min-height: 100vh;
