@@ -99,19 +99,53 @@ def editar_lista(request, lista_id):
 @allowed_roles(['admin', 'engredes'])
 def excluir_lista(request, lista_id):
     lista = get_object_or_404(Lista, id=lista_id)
+
+    # Verifica se existem solicitações para essa lista
+    if lista.solicitacoes.exists():
+        messages.error(
+            request,
+            f'A lista "{lista.nome}" não pode ser excluída, pois possui solicitações vinculadas.'
+        )
+        return redirect('listas:listar_listas')
+
     lista.delete()
     messages.success(request, f'Lista "{lista.nome}" excluída com sucesso!')
     return redirect('listas:listar_listas')
+
 
 @allowed_roles(['admin', 'engredes'])
 def excluir_listas_massa(request):
     if request.method == "POST":
         ids = request.POST.getlist('ids')
+
         if ids:
-            Lista.objects.filter(id__in=ids).delete()
-            messages.success(request, f"{len(ids)} lista(s) excluída(s) com sucesso!")
+            listas = Lista.objects.filter(id__in=ids)
+            listas_com_solicitacoes = []
+            listas_excluidas = []
+
+            for lista in listas:
+                if lista.solicitacoes.exists():
+                    listas_com_solicitacoes.append(lista.nome)
+                else:
+                    lista.delete()
+                    listas_excluidas.append(lista.nome)
+
+            # Mensagens para feedback do usuário
+            if listas_excluidas:
+                messages.success(
+                    request,
+                    f'{len(listas_excluidas)} lista(s) excluída(s) com sucesso!'
+                )
+
+            if listas_com_solicitacoes:
+                nomes = ", ".join(listas_com_solicitacoes)
+                messages.warning(
+                    request,
+                    f"As seguintes listas não puderam ser excluídas pois possuem solicitações vinculadas: {nomes}"
+                )
         else:
             messages.warning(request, "Nenhuma lista selecionada para exclusão.")
+
     return redirect('listas:listar_listas')
 
 
