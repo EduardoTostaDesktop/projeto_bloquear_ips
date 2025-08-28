@@ -48,7 +48,9 @@ def editar_solicitante(request, solicitante_id):
 @allowed_roles(['admin', 'engredes'])
 def excluir_solicitante(request, solicitante_id):
     solicitante = get_object_or_404(Solicitante, id=solicitante_id)
-    nome = solicitante.nome
+    if solicitante.solicitacao_set.exists():
+        messages.error(request, "Não é possível excluir este solicitante porque ele possui solicitações associadas.")
+        return redirect("solicitantes:listar_solicitantes")
     solicitante.delete()
-    messages.success(request, f'Solicitante "{nome}" excluído com sucesso!')
-    return redirect('solicitantes:listar_solicitantes')
+    messages.success(request, "Solicitante excluído com sucesso!")
+    return redirect("solicitantes:listar_solicitantes")

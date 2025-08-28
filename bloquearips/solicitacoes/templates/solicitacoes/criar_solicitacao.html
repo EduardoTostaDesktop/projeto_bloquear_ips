@@ -23,11 +23,25 @@
         <!-- Solicitante -->
         <div>
             <label class="block font-semibold mb-1">Solicitante</label>
-            <select name="solicitante" class="border rounded px-3 py-2 w-full" required>
+            <select name="solicitante" id="solicitante_existente" class="border rounded px-3 py-2 w-full">
+                <option value="">-- Criar novo solicitante --</option>
                 {% for s in solicitantes %}
                     <option value="{{ s.id }}">{{ s.nome }}</option>
                 {% endfor %}
             </select>
+        </div>
+
+        <!-- Campos de novo solicitante -->
+        <div id="novo_solicitante_campos" style="display:none;">
+            <div class="mt-3">
+                <label class="block font-semibold mb-1">Nome do Solicitante</label>
+                <input type="text" name="nome_solicitante" class="border rounded px-3 py-2 w-full" placeholder="Digite o nome do solicitante">
+            </div>
+
+            <div class="mt-3">
+                <label class="block font-semibold mb-1">Contato do Solicitante</label>
+                <input type="text" name="contato_solicitante" class="border rounded px-3 py-2 w-full" placeholder="Digite o e-mail do solicitante">
+            </div>
         </div>
 
         <!-- Lista existente -->
@@ -48,11 +62,11 @@
                 <input type="text" name="nome_lista" class="border rounded px-3 py-2 w-full" placeholder="Digite o nome da lista">
             </div>
 
-        <!-- component -->
-        <div class="bg-white p-7 rounded w-9/12 mx-auto">
-            <div x-data="dataFileDnD()" class="relative flex flex-col p-4 text-gray-400 border border-gray-200 rounded">
-                <div x-ref="dnd"
-                    class="relative flex flex-col text-gray-400 border border-gray-200 border-dashed rounded cursor-pointer">
+            <!-- Upload do arquivo -->
+            <div class="bg-white p-7 rounded w-9/12 mx-auto">
+                <div x-data="dataFileDnD()" class="relative flex flex-col p-4 text-gray-400 border border-gray-200 rounded">
+                    <div x-ref="dnd"
+                        class="relative flex flex-col text-gray-400 border border-gray-200 border-dashed rounded cursor-pointer">
                         <input accept=".xlsx" type="file" name="arquivo" 
                             class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
                             @change="addFiles($event)"
@@ -116,45 +130,47 @@
     </form>
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 <script src="https://unpkg.com/create-file-list"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const listaSelect = document.getElementById("lista_existente");
         const novaListaCampos = document.getElementById("nova_lista_campos");
+        const solicitanteSelect = document.getElementById("solicitante_existente");
+        const novoSolicitanteCampos = document.getElementById("novo_solicitante_campos");
 
-        function toggleCampos() {
-            if (listaSelect.value === "") {
-                novaListaCampos.style.display = "block";
-            } else {
-                novaListaCampos.style.display = "none";
-            }
+        function toggleCamposLista() {
+            novaListaCampos.style.display = listaSelect.value === "" ? "block" : "none";
         }
 
-        listaSelect.addEventListener("change", toggleCampos);
-        toggleCampos();
+        function toggleCamposSolicitante() {
+            novoSolicitanteCampos.style.display = solicitanteSelect.value === "" ? "block" : "none";
+        }
+
+        listaSelect.addEventListener("change", toggleCamposLista);
+        solicitanteSelect.addEventListener("change", toggleCamposSolicitante);
+
+        toggleCamposLista();
+        toggleCamposSolicitante();
     });
 
     function dataFileDnD() {
-    return {
-        files: [],
-        humanFileSize(size) {
-        const i = Math.floor(Math.log(size) / Math.log(1024));
-        return (size / Math.pow(1024, i)).toFixed(2) + " " + ["B", "kB", "MB", "GB", "TB"][i];
-        },
-        remove(index) {
-        let files = [...this.files];
-        files.splice(index, 1);
-        this.files = createFileList(files);
-        },
-        addFiles(e) {
-        const files = createFileList([...this.files], [...e.target.files]);
-        this.files = files;
-        }
-    };
+        return {
+            files: [],
+            humanFileSize(size) {
+                const i = Math.floor(Math.log(size) / Math.log(1024));
+                return (size / Math.pow(1024, i)).toFixed(2) + " " + ["B", "kB", "MB", "GB", "TB"][i];
+            },
+            remove(index) {
+                let files = [...this.files];
+                files.splice(index, 1);
+                this.files = createFileList(files);
+            },
+            addFiles(e) {
+                const files = createFileList([...this.files], [...e.target.files]);
+                this.files = files;
+            }
+        };
     }
-
-    
 </script>
 {% endblock %}

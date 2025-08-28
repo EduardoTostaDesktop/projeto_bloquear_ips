@@ -25,7 +25,6 @@ def detalhar_solicitacao(request, solicitacao_id):
         'solicitacao': solicitacao
     })
 
-
 @allowed_roles(['admin', 'engredes'])
 def criar_solicitacao(request):
     solicitantes = Solicitante.objects.all()
@@ -35,6 +34,8 @@ def criar_solicitacao(request):
     if request.method == "POST":
         tipo = request.POST.get("tipo")
         solicitante_id = request.POST.get("solicitante")
+        novo_solicitante_nome = request.POST.get("nome_solicitante")
+        novo_solicitante_contato = request.POST.get("contato_solicitante")
         lista_existente_id = request.POST.get("lista_existente")
         nome_lista = request.POST.get("nome_lista")
         enderecos_ids = request.POST.getlist("enderecos")
@@ -43,7 +44,19 @@ def criar_solicitacao(request):
         obs = request.POST.get("obs")
         arquivo = request.FILES.get("arquivo")
 
-        solicitante = get_object_or_404(Solicitante, id=solicitante_id)
+        # --- Seleciona ou cria solicitante ---
+        if novo_solicitante_nome and novo_solicitante_nome.strip() != "":
+            solicitante, created = Solicitante.objects.get_or_create(
+                nome=novo_solicitante_nome.strip(),
+                defaults={"contato": novo_solicitante_contato.strip() if novo_solicitante_contato else ""}
+            )
+            if created:
+                messages.success(request, f"Novo solicitante '{novo_solicitante_nome}' cadastrado com sucesso!")
+        elif solicitante_id and solicitante_id.strip() != "":
+            solicitante = get_object_or_404(Solicitante, id=solicitante_id)
+        else:
+            messages.error(request, "Você deve selecionar um solicitante ou cadastrar um novo.")
+            return redirect("solicitacoes:criar_solicitacao")
 
         # Converte data prevista para timezone-aware
         data_prevista_obj = timezone.make_aware(datetime.strptime(data_prevista, "%Y-%m-%d")) if data_prevista else None
@@ -66,13 +79,11 @@ def criar_solicitacao(request):
         # --- Monta os endereços que farão parte da solicitação ---
         enderecos_solicitacao = []
 
-        # Adiciona endereços selecionados manualmente
         if enderecos_ids:
             enderecos_selecionados = Endereco.objects.filter(id__in=enderecos_ids)
             lista.enderecos.add(*enderecos_selecionados)
             enderecos_solicitacao.extend(enderecos_selecionados)
 
-        # Processa arquivo XLSX, se enviado
         if arquivo:
             try:
                 wb = openpyxl.load_workbook(arquivo)
@@ -87,7 +98,6 @@ def criar_solicitacao(request):
                 messages.error(request, f"Erro ao processar o arquivo: {e}")
                 return redirect("solicitacoes:criar_solicitacao")
 
-        # Se nenhum endereço foi enviado manualmente ou via arquivo, usa os já existentes da lista
         if not enderecos_solicitacao and lista.enderecos.exists():
             enderecos_solicitacao = list(lista.enderecos.all())
 
@@ -95,11 +105,10 @@ def criar_solicitacao(request):
             messages.error(request, "Nenhum endereço válido foi selecionado ou encontrado.")
             return redirect("solicitacoes:criar_solicitacao")
 
-        # Gera o nome da solicitação
+        # --- Cria a solicitação ---
         data_str = datetime.now().strftime("%d/%m/%Y %H:%M")
         nome_solicitacao = f"{solicitante.nome} - {lista.nome} - {data_str}"
 
-        # Cria a solicitação
         solicitacao = Solicitacao.objects.create(
             lista=lista,
             tipo=tipo,
@@ -111,10 +120,9 @@ def criar_solicitacao(request):
             nome=nome_solicitacao
         )
 
-        # --- Atualiza apenas os endereços que precisam de alteração ---
+        # --- Atualiza status dos endereços ---
         novo_status = tipo == "BLOQUEIO"
         alterados = 0
-
         for endereco in enderecos_solicitacao:
             if endereco.status != novo_status:
                 endereco.status = novo_status
@@ -141,6 +149,8 @@ def criar_solicitacao(request):
         "listas": listas,
         "enderecos": enderecos
     })
+
+
 
 
 @allowed_roles(['admin', 'engredes'])

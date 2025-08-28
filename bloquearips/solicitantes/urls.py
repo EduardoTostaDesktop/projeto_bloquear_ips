@@ -9,4 +9,5 @@ urlpatterns = [
     path('<int:solicitante_id>/', views.detalhar_solicitante, name='detalhar_solicitante'),  # Detalhes
     path('<int:solicitante_id>/editar/', views.editar_solicitante, name='editar_solicitante'), # Editar
     path('excluir/<int:solicitante_id>/', views.excluir_solicitante, name='excluir_solicitante'),
+
 ]
