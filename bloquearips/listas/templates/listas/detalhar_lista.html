@@ -66,9 +66,24 @@
                     {% for solicitacao in lista.solicitacoes.all %}
                         <li>
                             <div class="flex flex-col">
-                                <span><strong>Tipo:</strong> {{ solicitacao.tipo }}</span>
-                                <span><strong>Nome:</strong> {{ solicitacao.nome }}</span>
-                                <span><strong>Solicitante:</strong> {{ solicitacao.solicitante }}</span>
+                                <span>
+                                    <strong>Tipo:</strong> 
+                                    <span class="{% if solicitacao.status %}text-green-600{% else %}text-red-600{% endif %}">
+                                        {{ solicitacao.tipo }}
+                                    </span>
+                                </span>
+                                <span>
+                                    <strong>Nome:</strong> 
+                                    <a href="{% url 'solicitacoes:detalhar_solicitacao' solicitacao.id %}" class="text-blue-600 hover:underline">
+                                        {{ solicitacao.nome }}
+                                    </a>
+                                </span>
+                                <span>
+                                    <strong>Solicitante:</strong> 
+                                    <a href="{% url 'solicitantes:detalhar_solicitante' solicitacao.solicitante.id %}" class="text-blue-600 hover:underline">
+                                        {{ solicitacao.solicitante.nome }}
+                                    </a>
+                                </span>
                                 <span><strong>Criado por:</strong> {{ solicitacao.criado_por }}</span>
                                 <span><strong>Data:</strong> {{ solicitacao.data_criacao|date:"d/m/Y H:i" }}</span>
                             </div>
