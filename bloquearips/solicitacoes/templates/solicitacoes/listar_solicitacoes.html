@@ -41,12 +41,11 @@
                         <td class="py-3 px-6">
                             <input type="checkbox" class="selectRow" name="ids" value="{{ s.id }}">
                         </td>
-                        <td class="py-3 px-6 max-w-xs break-words">
+                        <td class="py-3 px-6 max-w-xs whitespace-nowrap overflow-hidden overflow-ellipsis">
                             <a href="{% url 'solicitacoes:detalhar_solicitacao' s.id %}" class="text-blue-600 hover:underline">
                                 {{ s.nome }}
                             </a>
                         </td>
-
                         <td class="py-3 px-6">
                             <a href="{% url 'listas:detalhar_lista' s.lista.id %}" class="text-blue-600 hover:underline">
                                 {{ s.lista.nome }}
@@ -62,8 +61,8 @@
                             {% endif %}
                         </td>
 
-                        <td class="py-3 px-6">{{ s.solicitante }}</td>
-                        <td class="py-3 px-6">{{ s.criado_por }}</td>
+                        <td class="py-3 px-6 max-w-xs whitespace-nowrap overflow-hidden overflow-ellipsis">{{ s.solicitante }}</td>
+                        <td class="py-3 px-6 max-w-xs whitespace-nowrap overflow-hidden overflow-ellipsis">{{ s.criado_por }}</td>
                         <td class="py-3 px-6">{{ s.data_criacao|date:"d/m/Y H:i" }}</td>
                         <td class="py-3 px-6 flex space-x-2">
                             <a href="{% url 'solicitacoes:editar_solicitacao' s.id %}" 
