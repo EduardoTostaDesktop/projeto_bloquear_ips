@@ -36,7 +36,7 @@
                             <th class="border px-4 py-2">Nome</th>
                             <th class="border px-4 py-2">Tipo</th>
                             <th class="border px-4 py-2">Lista</th>
-                            <th class="border px-4 py-2">Data Prevista</th>
+                            <th class="border px-4 py-2">Data Prevista p/Desbloqueio</th>
                             <th class="border px-4 py-2">Criado em</th>
                         </tr>
                     </thead>
@@ -50,7 +50,7 @@
                                 </td>
                                 <td class="border px-4 py-2">{{ solicitacao.tipo }}</td>
                                 <td class="border px-4 py-2">{{ solicitacao.lista.nome }}</td>
-                                <td class="border px-4 py-2">{{ solicitacao.data_prevista|date:"d/m/Y H:i"|default:"-" }}</td>
+                                <td class="border px-4 py-2">{{ solicitacao.data_prevista|date:"d/m/Y"|default:"-" }}</td>
                                 <td class="border px-4 py-2">{{ solicitacao.data_criacao|date:"d/m/Y H:i" }}</td>
                             </tr>
                         {% endfor %}
