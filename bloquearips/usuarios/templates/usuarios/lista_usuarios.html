@@ -27,59 +27,95 @@
 
         <select id="tipoFilter" class="my-2 p-2 border border-gray-200 rounded" onchange="filterTable()">
             <option value="">Todos os tipos</option>
+            <option value="Administrador">Administrador</option>
             <option value="Engenharia de Redes">Engenharia de Redes</option>
             <option value="NOC">NOC</option>
         </select>
     </div>
 
-    <!-- Botão Cadastrar alinhado à esquerda da tabela -->
-    <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full mb-4">
-        <div class="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
-            <a href="{% url 'cadastrar_usuario' %}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+    <!-- Formulário de exclusão em massa -->
+    <form id="usuariosForm" method="POST" action="{% url 'excluir_usuarios_massa' %}">
+        {% csrf_token %}
+            <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full mb-4 mx-auto flex flex-col sm:flex-row sm:justify-center sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">   
+            <a href="{% url 'cadastrar_usuario' %}" 
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                 Cadastrar
             </a>
-        </div>
-    </div>
 
-    <!-- Tabela de usuários -->
-    <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full overflow-x-auto">
-        <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full">
-            <thead class="bg-gray-600 text-white text-sm sm:text-base">
-                <tr>
-                    <th class="py-3 px-6 text-left">Username</th>
-                    <th class="py-3 px-6 text-left">Email</th>
-                    <th class="py-3 px-6 text-left">Tipo</th>
-                    <th class="py-3 px-6 text-center">Ações</th>
-                </tr>
-            </thead>
-            <tbody id="userTable" class="text-sm sm:text-base">
-                {% for usuario in usuarios %}
-                <tr class="border-b hover:bg-gray-100">
-                    <td class="py-3 px-6">{{ usuario.username }}</td>
-                    <td class="py-3 px-6">{{ usuario.email }}</td>
-                    <td class="py-3 px-6">{{ usuario.get_tipo_display }}</td>
-                    <td class="py-3 px-6 text-center flex justify-center space-x-2">
-                        <a href="{% url 'editar_usuario' usuario.id %}" class="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded">Editar</a>
-                        <button onclick="confirmDelete({{ usuario.id }})" class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded">Excluir</button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            <button type="button" id="btnExcluirUsuarios" 
+                class="ml-auto px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                Excluir Selecionados
+            </button>
+        </div>
+
+
+        <!-- Tabela de usuários -->
+        <div class="min-w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full max-h-[500px] overflow-y-auto border border-gray-200 rounded">
+            <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full">
+                <thead class="bg-gray-600 text-white text-sm sm:text-base sticky top-0">
+                    <tr>
+                        <th class="py-3 px-6">
+                            <input type="checkbox" id="selectAll" onclick="toggleAll(this)">
+                        </th>
+                        <th class="py-3 px-6 text-left">Username</th>
+                        <th class="py-3 px-6 text-left">Email</th>
+                        <th class="py-3 px-6 text-left">Tipo</th>
+                        <th class="py-3 px-6 text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="userTable" class="text-sm sm:text-base">
+                    {% for usuario in usuarios %}
+                    <tr class="border-b hover:bg-gray-100">
+                        <td class="py-3 px-6">
+                            <input type="checkbox" class="selectRow" name="ids" value="{{ usuario.id }}" data-nome="{{ usuario.username }}">
+                        </td>
+                        <td class="py-3 px-6">{{ usuario.username }}</td>
+                        <td class="py-3 px-6">{{ usuario.email }}</td>
+                        <td class="py-3 px-6">{{ usuario.get_tipo_display }}</td>
+                        <td class="py-3 px-6 text-center flex justify-center space-x-2">
+                            <a href="{% url 'editar_usuario' usuario.id %}" 
+                               class="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded">Editar</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-6 text-gray-500 italic">
+                            Nenhum usuário cadastrado no momento.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+
+<!-- Modal de confirmação de exclusão em massa -->
+<div id="confirmModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+        <h2 class="text-lg font-bold mb-4 text-gray-800">Confirmação de Exclusão</h2>
+        <p class="text-sm text-gray-700 mb-3">
+            Tem certeza que deseja excluir os seguintes usuários?
+        </p>
+        <ul id="selectedUsers" class="text-sm text-red-600 font-semibold list-disc list-inside mb-4 max-h-40 overflow-y-auto"></ul>
+        <div class="flex justify-end space-x-3">
+            <button type="button" id="cancelDelete" class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded">Cancelar</button>
+            <button type="button" id="confirmDelete" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded">Confirmar</button>
+        </div>
     </div>
 </div>
 
-<!-- Script para filtrar tabela -->
 <script>
+// Filtro por nome, email e tipo
 function filterTable() {
     const input = document.getElementById('searchInput').value.toLowerCase();
     const tipo = document.getElementById('tipoFilter').value;
     const rows = document.querySelectorAll('#userTable tr');
 
     rows.forEach(row => {
-        const username = row.cells[0]?.textContent.toLowerCase() || '';
-        const email = row.cells[1]?.textContent.toLowerCase() || '';
-        const tipoText = row.cells[2]?.textContent || '';
+        const username = row.cells[1]?.textContent.toLowerCase() || '';
+        const email = row.cells[2]?.textContent.toLowerCase() || '';
+        const tipoText = row.cells[3]?.textContent || '';
 
         const matchesText = username.includes(input) || email.includes(input);
         const matchesTipo = tipo === "" || tipoText === tipo;
@@ -88,10 +124,50 @@ function filterTable() {
     });
 }
 
-function confirmDelete(userId) {
-    if (confirm('Tem certeza que deseja excluir este usuário?')) {
-        window.location.href = `/usuarios/excluir/${userId}/`;
-    }
+// Selecionar todos os checkboxes
+function toggleAll(master) {
+    document.querySelectorAll('.selectRow').forEach(cb => cb.checked = master.checked);
 }
+
+// Modal para confirmar exclusão
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("usuariosForm");
+    const btnExcluir = document.getElementById("btnExcluirUsuarios");
+    const modal = document.getElementById("confirmModal");
+    const selectedList = document.getElementById("selectedUsers");
+    const cancelBtn = document.getElementById("cancelDelete");
+    const confirmBtn = document.getElementById("confirmDelete");
+
+    btnExcluir.addEventListener("click", function () {
+        const checkboxes = document.querySelectorAll(".selectRow:checked");
+        if (checkboxes.length === 0) {
+            alert("Selecione ao menos um usuário para excluir.");
+            return;
+        }
+        selectedList.innerHTML = "";
+        checkboxes.forEach(cb => {
+            const li = document.createElement("li");
+            li.textContent = cb.dataset.nome;
+            selectedList.appendChild(li);
+        });
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+    });
+
+    cancelBtn.addEventListener("click", function () {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    });
+
+    confirmBtn.addEventListener("click", function () {
+        const acaoInput = document.createElement("input");
+        acaoInput.type = "hidden";
+        acaoInput.name = "acao";
+        acaoInput.value = "excluir";
+        form.appendChild(acaoInput);
+        form.submit();
+    });
+});
 </script>
+
 {% endblock %}
