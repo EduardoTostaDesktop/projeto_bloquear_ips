@@ -150,6 +150,39 @@ def criar_solicitacao(request):
         "enderecos": enderecos
     })
 
+@allowed_roles(['admin', 'engredes'])
+def editar_solicitacao(request, solicitacao_id):
+    solicitacao = get_object_or_404(Solicitacao, id=solicitacao_id)
+
+    if request.method == "POST":
+        # Campos permitidos para edição
+        solicitacao.obs = request.POST.get("obs", solicitacao.obs)
+        solicitacao.desc = request.POST.get("desc", solicitacao.desc)
+
+        data_prevista = request.POST.get("data_prevista")
+        if data_prevista:
+            try:
+                data_prevista_obj = timezone.make_aware(datetime.strptime(data_prevista, "%Y-%m-%d"))
+                solicitacao.data_prevista = data_prevista_obj
+
+                # --- Atualiza também a data prevista da lista associada ---
+                if solicitacao.lista:
+                    solicitacao.lista.data_prevista_desbloqueio = data_prevista_obj
+                    solicitacao.lista.save()
+
+            except ValueError:
+                messages.error(request, "Formato de data inválido. Use o formato AAAA-MM-DD.")
+                return redirect("solicitacoes:editar_solicitacao", solicitacao_id=solicitacao.id)
+
+        solicitacao.save()
+        messages.success(request, "Solicitação atualizada com sucesso!")
+        return redirect("solicitacoes:detalhar_solicitacao", solicitacao_id=solicitacao.id)
+
+    return render(request, "solicitacoes/editar_solicitacao.html", {
+        "solicitacao": solicitacao
+    })
+
+
 
 
 

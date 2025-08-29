@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Editar Solicitação{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6 bg-white rounded shadow-md mt-6">
+    <h2 class="text-2xl font-bold mb-4">Editar Solicitação</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Descrição -->
+        <div class="mb-4">
+            <label for="desc" class="block font-semibold mb-1">Descrição:</label>
+            <textarea name="desc" id="desc" rows="3"
+                class="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-blue-300">{{ solicitacao.desc }}</textarea>
+        </div>
+
+        <!-- Observações -->
+        <div class="mb-4">
+            <label for="obs" class="block font-semibold mb-1">Observações:</label>
+            <textarea name="obs" id="obs" rows="3"
+                class="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-blue-300">{{ solicitacao.obs }}</textarea>
+        </div>
+
+        <!-- Data Prevista -->
+        <div class="mb-4">
+            <label for="data_prevista" class="block font-semibold mb-1">Data Prevista:</label>
+            <input type="date" name="data_prevista" id="data_prevista"
+                value="{{ solicitacao.data_prevista|date:'Y-m-d' }}"
+                class="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-blue-300">
+        </div>
+
+        <!-- Botões -->
+        <div class="flex justify-between items-center">
+            <a href="{% url 'solicitacoes:detalhar_solicitacao' solicitacao.id %}"
+               class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancelar</a>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Salvar</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
