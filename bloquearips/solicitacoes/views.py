@@ -1,5 +1,5 @@
 import openpyxl
-from datetime import datetime
+from datetime import date, datetime
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
@@ -44,6 +44,22 @@ def criar_solicitacao(request):
         obs = request.POST.get("obs")
         arquivo = request.FILES.get("arquivo")
 
+        data_prevista_obj = None
+        data_prevista = data_prevista.strip() if data_prevista else ""
+
+        if data_prevista:  # Só tenta validar se o usuário realmente preencheu algo
+            try:
+                data_prevista_obj = datetime.strptime(data_prevista, "%Y-%m-%d").date()
+            except ValueError:
+                messages.error(request, "Data inválida!")
+                return redirect("solicitacoes:criar_solicitacao")
+
+            # Se o usuário informou a data, valida se não é anterior ao dia atual
+            hoje = date.today()
+            if data_prevista_obj < hoje:
+                messages.error(request, "A data prevista não pode ser anterior à data atual!")
+                return redirect("solicitacoes:criar_solicitacao")
+
         # --- Seleciona ou cria solicitante ---
         if novo_solicitante_nome and novo_solicitante_nome.strip() != "":
             solicitante, created = Solicitante.objects.get_or_create(
@@ -57,9 +73,6 @@ def criar_solicitacao(request):
         else:
             messages.error(request, "Você deve selecionar um solicitante ou cadastrar um novo.")
             return redirect("solicitacoes:criar_solicitacao")
-
-        # Converte data prevista para timezone-aware
-        data_prevista_obj = timezone.make_aware(datetime.strptime(data_prevista, "%Y-%m-%d")) if data_prevista else None
 
         # --- Seleciona lista existente ou cria nova ---
         if lista_existente_id:
@@ -119,6 +132,11 @@ def criar_solicitacao(request):
             criado_por=request.user,
             nome=nome_solicitacao
         )
+        
+        # 🔹 Atualiza também a lista com a nova data, se houver
+        if data_prevista_obj:
+            lista.data_prevista_desbloqueio = data_prevista_obj
+            lista.save()
 
         # --- Atualiza status dos endereços ---
         novo_status = tipo == "BLOQUEIO"
@@ -150,39 +168,55 @@ def criar_solicitacao(request):
         "enderecos": enderecos
     })
 
+
 @allowed_roles(['admin', 'engredes'])
 def editar_solicitacao(request, solicitacao_id):
     solicitacao = get_object_or_404(Solicitacao, id=solicitacao_id)
 
     if request.method == "POST":
-        # Campos permitidos para edição
+        # Campos que podem ser editados
         solicitacao.obs = request.POST.get("obs", solicitacao.obs)
         solicitacao.desc = request.POST.get("desc", solicitacao.desc)
 
         data_prevista = request.POST.get("data_prevista")
         if data_prevista:
             try:
+                # Converte a data para objeto datetime com timezone
                 data_prevista_obj = timezone.make_aware(datetime.strptime(data_prevista, "%Y-%m-%d"))
+
+                # --- VALIDAÇÃO ---
+                if data_prevista_obj < solicitacao.data_criacao:
+                    messages.error(
+                        request,
+                        "A data prevista não pode ser anterior à data de criação da solicitação!"
+                    )
+                    return redirect("solicitacoes:editar_solicitacao", solicitacao_id=solicitacao.id)
+
+                # Atualiza a solicitação
                 solicitacao.data_prevista = data_prevista_obj
 
-                # --- Atualiza também a data prevista da lista associada ---
+                # Atualiza também a lista associada
                 if solicitacao.lista:
                     solicitacao.lista.data_prevista_desbloqueio = data_prevista_obj
                     solicitacao.lista.save()
+
+                    # ✅ ATUALIZA TODOS OS ENDEREÇOS DESSA LISTA
+                    Endereco.objects.filter(listas=solicitacao.lista).update(
+                        data_desbloqueio=data_prevista_obj
+                    )
+
 
             except ValueError:
                 messages.error(request, "Formato de data inválido. Use o formato AAAA-MM-DD.")
                 return redirect("solicitacoes:editar_solicitacao", solicitacao_id=solicitacao.id)
 
         solicitacao.save()
-        messages.success(request, "Solicitação atualizada com sucesso!")
+        messages.success(request, "Solicitação, lista e endereços atualizados com sucesso!")
         return redirect("solicitacoes:detalhar_solicitacao", solicitacao_id=solicitacao.id)
 
     return render(request, "solicitacoes/editar_solicitacao.html", {
         "solicitacao": solicitacao
     })
-
-
 
 
 
