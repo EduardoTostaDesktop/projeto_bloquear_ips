@@ -55,9 +55,11 @@
         <button type="submit" name="acao" value="desbloquear" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
             Desbloquear
         </button>
-        <button type="submit" name="acao" value="excluir" class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800">
+        <button type="button" id="btnExcluir" name="acao" value="excluir"
+            class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800">
             Excluir Selecionados
         </button>
+
         <a href="{% url 'cadastrar_endereco' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
             Cadastrar
         </a>
@@ -111,7 +113,30 @@
             </tbody>
         </table>
     </div>
-</form>
+    <!-- Modal de Confirmação -->
+    <div id="confirmModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+            <h2 class="text-lg font-bold mb-4 text-gray-800">Confirmação de Exclusão</h2>
+            <p class="text-sm text-gray-700 mb-3">
+                Tem certeza que deseja excluir os seguintes endereços?
+            </p>
+            <ul id="selectedAddresses" class="text-sm text-red-600 font-semibold list-disc list-inside mb-4"></ul>
+            <p class="text-xs text-gray-500 mb-4">
+                <strong>Atenção:</strong> Ao excluir um endereço, ele também será removido de <span class="font-semibold">todas as listas</span> associadas.
+            </p>
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="cancelDelete"
+                    class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded">
+                    Cancelar
+                </button>
+                <button type="button" id="confirmDelete"
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
 
 <script>
 function toggleAll(master) {
@@ -147,6 +172,50 @@ function filterTable() {
     });
 }
 
+document.addEventListener("DOMContentLoaded", function () {
+    const btnExcluir = document.getElementById("btnExcluir");
+    const modal = document.getElementById("confirmModal");
+    const cancelBtn = document.getElementById("cancelDelete");
+    const confirmBtn = document.getElementById("confirmDelete");
+    const selectedList = document.getElementById("selectedAddresses");
+    const form = document.getElementById("massaForm");
+
+    btnExcluir.addEventListener("click", function () {
+        const checkboxes = document.querySelectorAll(".selectRow:checked");
+        selectedList.innerHTML = "";
+
+        if (checkboxes.length === 0) {
+            alert("Selecione ao menos um endereço para excluir.");
+            return;
+        }
+
+        checkboxes.forEach(cb => {
+            const endereco = cb.closest("tr").querySelector("td:nth-child(2)").innerText;
+            const li = document.createElement("li");
+            li.textContent = endereco;
+            selectedList.appendChild(li);
+        });
+
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+    });
+
+    cancelBtn.addEventListener("click", function () {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    });
+
+    confirmBtn.addEventListener("click", function () {
+        // Define a ação como excluir antes de enviar
+        const acaoInput = document.createElement("input");
+        acaoInput.type = "hidden";
+        acaoInput.name = "acao";
+        acaoInput.value = "excluir";
+        form.appendChild(acaoInput);
+
+        form.submit();
+    });
+});
 </script>
 
 {% endblock %}
