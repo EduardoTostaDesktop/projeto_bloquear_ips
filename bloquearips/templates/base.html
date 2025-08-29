@@ -4,15 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Meu Projeto{% endblock %}</title>
+    <title>{% block title %}Address Control{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/ico.ico' %}">
+
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
     
     <!-- Navbar -->
     <nav class="bg-gray-800 text-white p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <a href="/" class="font-bold text-xl">CONTROLE | BLOQUEIO DE ENDEREÇOS</a>
+            <a href="{% url 'home' %}" class="flex items-center">
+                <img src="{% static 'images/LogoBlockAD.png' %}" alt="Block AD Logo" class="h-12 w-12">
+                <h1 class="font-bold text-2xl">
+                    <span class="text-red-600" style="color:#E53E3E;">Address</span>
+                    <span class="text-green-600" style="color:#38A169;">Control</span>
+                </h1>
+
+
+            </a>
+
             
             {% if user.is_authenticated %}
             <div class="flex items-center space-x-4">
@@ -62,7 +73,7 @@
 
     <!-- Footer -->
     <footer class="bg-gray-800 text-white p-4 text-center">
-        &copy; 2025 CONTROLE | BLOQUEIO DE ENDEREÇOS. Todos os direitos reservados.
+        &copy; 2025 Address Control. Todos os direitos reservados.
     </footer>
 
 </body>

@@ -351,6 +351,9 @@
   .h-8 {
     height: calc(var(--spacing) * 8);
   }
+  .h-12 {
+    height: calc(var(--spacing) * 12);
+  }
   .h-full {
     height: 100%;
   }
@@ -380,6 +383,9 @@
   }
   .w-9\/12 {
     width: calc(9/12 * 100%);
+  }
+  .w-12 {
+    width: calc(var(--spacing) * 12);
   }
   .w-72 {
     width: calc(var(--spacing) * 72);
