@@ -11,9 +11,17 @@
 <form id="listasForm" method="POST" action="{% url 'listas:excluir_listas_massa' %}">
     {% csrf_token %}
         <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full mb-4 mx-auto flex flex-col sm:flex-row sm:justify-center sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">   
-            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-                Excluir Selecionadas
-            </button>
+        <button type="button" onclick="openConfirmModal(
+            document.getElementById('listasForm'),
+            document.querySelectorAll('.selectRow:checked'),
+            'Confirmação de Exclusão',
+            'Tem certeza que deseja excluir as seguintes listas?'
+        )" class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800">
+            Excluir Selecionadas
+        </button>
+
+
+
             <a href="{% url 'listas:criar_lista' %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition">
             + Nova Lista
         </a>
@@ -23,7 +31,7 @@
             <thead class="bg-gray-600 text-white">
                 <tr>
                     <th class="py-3 px-6">
-                        <input type="checkbox" id="selectAll" onclick="toggleAll(this)">
+                        <input type="checkbox" id="selectAll" onclick="toggleAll(this)">        
                     </th>
                     <th class="py-3 px-6 text-left">Nome</th>
                     <th class="py-3 px-6 text-left">Solicitante</th>
@@ -37,7 +45,7 @@
                 {% for lista in listas %}
                 <tr class="border-b hover:bg-gray-100">
                     <td class="py-3 px-6">
-                        <input type="checkbox" class="selectRow" name="ids" value="{{ lista.id }}">
+                        <input type="checkbox" class="selectRow" name="ids" value="{{ lista.id }}" data-nome="{{ lista.nome }}">
                     </td>
                     <td class="py-3 px-6">
                         <a href="{% url 'listas:detalhar_lista' lista.id %}" class="text-blue-600 hover:underline">
