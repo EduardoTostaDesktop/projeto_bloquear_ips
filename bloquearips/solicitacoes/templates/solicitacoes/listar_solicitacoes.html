@@ -41,17 +41,27 @@
                         <td class="py-3 px-6">
                             <input type="checkbox" class="selectRow" name="ids" value="{{ s.id }}">
                         </td>
-                        <td class="py-3 px-6">
-                          <a href="{% url 'solicitacoes:detalhar_solicitacao' s.id %}" class="text-blue-600 hover:underline">
-                                {{ s.nome  }}
+                        <td class="py-3 px-6 max-w-xs break-words">
+                            <a href="{% url 'solicitacoes:detalhar_solicitacao' s.id %}" class="text-blue-600 hover:underline">
+                                {{ s.nome }}
                             </a>
                         </td>
+
                         <td class="py-3 px-6">
                             <a href="{% url 'listas:detalhar_lista' s.lista.id %}" class="text-blue-600 hover:underline">
                                 {{ s.lista.nome }}
                             </a>
                         </td>
-                        <td class="py-3 px-6">{{ s.get_tipo_display }}</td>
+                        <td class="py-3 px-6">
+                            {% if s.tipo == "BLOQUEIO" %}
+                                <span class="text-red-600 font-bold">{{ s.get_tipo_display }}</span>
+                            {% elif s.tipo == "DESBLOQUEIO" %}
+                                <span class="text-green-600 font-bold">{{ s.get_tipo_display }}</span>
+                            {% else %}
+                                <span>{{ s.get_tipo_display }}</span>
+                            {% endif %}
+                        </td>
+
                         <td class="py-3 px-6">{{ s.solicitante }}</td>
                         <td class="py-3 px-6">{{ s.criado_por }}</td>
                         <td class="py-3 px-6">{{ s.data_criacao|date:"d/m/Y H:i" }}</td>
