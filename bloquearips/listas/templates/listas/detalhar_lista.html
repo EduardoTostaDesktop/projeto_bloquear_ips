@@ -63,7 +63,7 @@
             <span class="font-semibold text-lg">Solicitações:</span>
             <div class="border rounded p-3 max-h-64 overflow-y-auto bg-gray-50">
                 <ul class="list-disc list-inside space-y-2">
-                    {% for solicitacao in lista.solicitacoes.all %}
+                    {% for solicitacao in lista.solicitacoes.all|dictsortreversed:"data_criacao" %}
                         <li>
                             <div class="flex flex-col">
                                 <span>
