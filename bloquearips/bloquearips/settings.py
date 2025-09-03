@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-y#tky+5)x962isxcl6&^5j1x$0dnlwxpj9wx$n4!&(afpf--+8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['projeto-bloquear-ips.onrender.com']
 
 
 # Application definition
