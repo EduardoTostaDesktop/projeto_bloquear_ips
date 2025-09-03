@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container mx-auto p-6 bg-white rounded shadow-md mt-6">
-    <h2 class="text-2xl font-bold mb-4">Editar Solicitação</h2>
+    <h2 class="text-2xl font-bold mb-4">{{solicitacao.nome}}</h2>
 
     <form method="POST">
         {% csrf_token %}
