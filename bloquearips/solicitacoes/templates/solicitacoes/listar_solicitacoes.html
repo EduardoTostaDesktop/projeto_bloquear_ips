@@ -132,8 +132,7 @@
                             class="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded-lg transition">
                                 Editar
                             </a>
-
-                            <button type="button" onclick="confirmDelete({{ s.id }})" 
+                            <button type="button" onclick="confirmDelete({{ s.id }}, '{{ s.nome }}')"
                                     class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg">
                                 Excluir
                             </button>
@@ -156,6 +155,26 @@
 function toggleAll(master) {
     const checkboxes = document.querySelectorAll('.selectRow');
     checkboxes.forEach(cb => cb.checked = master.checked);
+}
+
+function confirmDelete(id) {
+    const form = document.getElementById('solicitacoesForm');
+
+    // Criar um input oculto para enviar o ID da solicitação a ser excluída
+    let input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'ids';
+    input.value = id;
+
+    form.appendChild(input);
+
+    // Pergunta de confirmação
+    if (confirm('Tem certeza que deseja excluir esta solicitação?')) {
+        form.submit();
+    }
+
+    // Remove o input após envio para evitar duplicação
+    form.removeChild(input);
 }
 
 function filterTable() {
@@ -196,6 +215,81 @@ function filterTable() {
         rows[i].style.display = (matchesSearch && matchesLista && matchesTipo && matchesSolicitante && matchesCriador && matchesData) ? "" : "none";
     }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("confirmModal");
+    const cancelBtn = document.getElementById("cancelDelete");
+    const confirmBtn = document.getElementById("confirmDelete");
+    const selectedList = document.getElementById("selectedItems");
+
+    let currentForm = null;
+    let currentItemId = null; // id da solicitação individual
+
+    // Função para abrir modal para múltiplos ou um único item
+    window.openConfirmModal = function(form, checkboxes, title = "Confirmação de Exclusão", message = "Tem certeza que deseja excluir os seguintes itens?") {
+        selectedList.innerHTML = "";
+        currentForm = form;
+        currentItemId = null;
+
+        if (checkboxes.length === 0) {
+            alert("Selecione ao menos um item para excluir.");
+            return;
+        }
+
+        document.getElementById("modalTitle").innerText = title;
+        document.getElementById("modalMessage").innerText = message;
+
+        checkboxes.forEach(cb => {
+            const nome = cb.dataset.nome || cb.value || "Item";
+            const li = document.createElement("li");
+            li.textContent = nome;
+            selectedList.appendChild(li);
+        });
+
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+    }
+
+    // Função para abrir modal para um único item
+    window.confirmDelete = function(id, nome) {
+        selectedList.innerHTML = "";
+        currentItemId = id;
+
+        const li = document.createElement("li");
+        li.textContent = nome;
+        selectedList.appendChild(li);
+
+        currentForm = document.getElementById('solicitacoesForm');
+
+        document.getElementById("modalTitle").innerText = "Confirmação de Exclusão";
+        document.getElementById("modalMessage").innerText = "Tem certeza que deseja excluir este item?";
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+    }
+
+    cancelBtn.addEventListener("click", function () {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    });
+
+    confirmBtn.addEventListener("click", function () {
+        if (currentForm) {
+            if (currentItemId) {
+                // input hidden para excluir um único item
+                let input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "ids";
+                input.value = currentItemId;
+                currentForm.appendChild(input);
+            } else {
+                // já existem inputs hidden para múltiplos itens selecionados
+            }
+
+            // envia o form
+            currentForm.submit();
+        }
+    });
+});
 </script>
 
 {% endblock %}
