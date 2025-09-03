@@ -81,6 +81,17 @@
     padding: 0;
     border: 0 solid;
   }
+
+.filter-input {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    outline: none;
+    background-color: #fff;
+    color: #1f2937;
+}
+
   html, :host {
     line-height: 1.5;
     -webkit-text-size-adjust: 100%;

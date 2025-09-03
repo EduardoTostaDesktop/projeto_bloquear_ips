@@ -7,9 +7,66 @@
 <div class="container mx-auto py-10 flex flex-col items-center">
 
     <h1 class="text-3xl font-bold mb-6">Solicitações Cadastradas</h1>
+    <!-- Filtros -->
+    <div class="w-full md:w-1/2 mb-6 flex space-x-2">
+        <!-- Input de busca -->
+        <div class="flex-1 my-2 p-1 bg-white flex border border-gray-200 rounded">
+            <input 
+                placeholder="Buscar por endereço, nome ou descrição" 
+                class="p-2 appearance-none outline-none w-full text-gray-800"
+                id="searchInput"
+                oninput="filterTable()" 
+            >
+            <div class="text-gray-300 w-8 py-1 pl-2 pr-1 border-l flex items-center border-gray-200">
+                <button class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none" onclick="filterTable()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m1.85-5.15A7 7 0 1110 3a7 7 0 018.5 8.5z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+<div class="w-full md:w-1/2 mb-6 flex flex-wrap justify-center items-center gap-2 mx-auto">
+        <!-- Lista -->
+        <select id="listaFilter" class="filter-input" onchange="filterTable()">
+            <option value="">Todas as listas</option>
+            {% for nome in lista_nomes %}
+                <option value="{{ nome|lower }}">{{ nome }}</option>
+            {% endfor %}
+        </select>
+        
+        <!-- Tipo -->
+        <select id="tipoFilter" class="filter-input" onchange="filterTable()">
+            <option value="">Todos os tipos</option>
+            <option value="bloqueio">Bloqueio</option>
+            <option value="desbloqueio">Desbloqueio</option>
+        </select>
+
+        <!-- Solicitante -->
+        <select id="solicitanteFilter" class="filter-input" onchange="filterTable()">
+            <option value="">Todos os solicitantes</option>
+            {% for nome in solicitantes %}
+                <option value="{{ nome|lower }}">{{ nome }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Criador -->
+        <select id="criadorFilter" class="filter-input" onchange="filterTable()">
+            <option value="">Todos os criadores</option>
+            {% for nome in criadores %}
+                <option value="{{ nome|lower }}">{{ nome }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Data -->
+        <input type="date" id="dataFilter" class="filter-input" onchange="filterTable()">
+    </div>
+
+        
 
     <form id="solicitacoesForm" method="POST" action="{% url 'solicitacoes:excluir_solicitacoes_massa' %}">
         {% csrf_token %}
+
             <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full mb-4 mx-auto flex flex-col sm:flex-row sm:justify-center sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">   
             <button type="button" onclick="openConfirmModal(
                 document.getElementById('solicitacoesForm'),
@@ -26,7 +83,7 @@
                 </a>
             </div>
         <div class="min-w-full max-h-[500px] overflow-y-auto border border-gray-200 rounded">
-            <table class="min-w-full table-auto">
+            <table id="minhaTabela" class="min-w-full table-auto">
                 <thead class="bg-gray-600 text-white sticky top-0 z-20">
                     <tr>
                         <th class="py-3 px-6">
@@ -101,10 +158,44 @@ function toggleAll(master) {
     checkboxes.forEach(cb => cb.checked = master.checked);
 }
 
-function confirmDelete(solicitacaoId) {
-    if (confirm('Tem certeza que deseja excluir esta solicitação?')) {
-        window.location.href = `/solicitacoes/excluir/${solicitacaoId}/`;
+function filterTable() {
+    const searchValue = document.getElementById('searchInput').value.toLowerCase().trim();
+    const listaValue = document.getElementById('listaFilter').value.toLowerCase().trim();
+    const tipoValue = document.getElementById('tipoFilter').value.toLowerCase().trim();
+    const solicitanteValue = document.getElementById('solicitanteFilter').value.toLowerCase().trim();
+    const criadorValue = document.getElementById('criadorFilter').value.toLowerCase().trim();
+    const dataValue = document.getElementById('dataFilter').value;
+
+    const table = document.getElementById('minhaTabela'); 
+    const rows = table.getElementsByTagName('tr');
+
+    for (let i = 1; i < rows.length; i++) {
+        const cells = rows[i].getElementsByTagName('td');
+
+        const nome = (cells[1]?.innerText || "").toLowerCase().trim();
+        const lista = (cells[2]?.innerText || "").toLowerCase().trim();
+        const tipo = (cells[3]?.innerText || "").toLowerCase().trim();
+        const solicitante = (cells[4]?.innerText || "").toLowerCase().trim();
+
+        const criador = (cells[5]?.innerText || "").toLowerCase().trim();
+        const dataCell = (cells[6]?.innerText || "").split(' ')[0]; // pega só dd/mm/yyyy
+        let dataFormatted = "";
+        const parts = dataCell.split('/');
+        if (parts.length === 3) {
+            dataFormatted = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+        }
+
+
+        const matchesSearch = nome.includes(searchValue) || lista.includes(searchValue) || tipo.includes(searchValue);
+        const matchesLista = !listaValue || lista === listaValue;
+        const matchesTipo = !tipoValue || tipo === tipoValue;
+        const matchesSolicitante = !solicitanteValue || solicitante === solicitanteValue;
+        const matchesCriador = !criadorValue || criador === criadorValue;
+        const matchesData = !dataValue || dataFormatted === dataValue;
+
+        rows[i].style.display = (matchesSearch && matchesLista && matchesTipo && matchesSolicitante && matchesCriador && matchesData) ? "" : "none";
     }
 }
 </script>
+
 {% endblock %}

@@ -13,9 +13,18 @@ from enderecos.models import Endereco
 @allowed_roles(['admin', 'engredes'])
 def listar_solicitacoes(request):
     solicitacoes = Solicitacao.objects.all().order_by("-id")
+    
+    # Gera listas únicas para os filtros
+    lista_nomes = Lista.objects.values_list('nome', flat=True).distinct()
+    solicitantes = Lista.objects.values_list('solicitante__nome', flat=True).distinct()
+    criadores = Lista.objects.values_list('criador__username', flat=True).distinct()
+
     return render(request, "solicitacoes/listar_solicitacoes.html", {
-        "solicitacoes": solicitacoes
-    })
+        "solicitacoes": solicitacoes,
+        "lista_nomes": lista_nomes,
+        "solicitantes": solicitantes,
+        "criadores": criadores,
+})
 
 
 @allowed_roles(['admin', 'engredes'])
