@@ -13,6 +13,11 @@ def perfil_endereco(request, endereco_id):
     endereco = get_object_or_404(Endereco, id=endereco_id)
     return render(request, "enderecos/perfil_endereco.html", {"endereco": endereco})
 
+from enderecos.utils import (
+    contar_ips_bloqueados,
+    contar_urls_bloqueadas
+)
+
 @login_required
 def listar_enderecos(request):
     search_query = request.GET.get("search", "")
@@ -21,7 +26,6 @@ def listar_enderecos(request):
 
     enderecos = Endereco.objects.all()
 
-    # 🔍 filtros da tabela (mantém como está)
     if search_query:
         enderecos = enderecos.filter(
             Q(endereco__icontains=search_query) |
@@ -34,26 +38,10 @@ def listar_enderecos(request):
     if status_filter:
         enderecos = enderecos.filter(status=status_filter == "bloqueado")
 
-    # 📊 CONTADORES (independentes dos filtros)
-    dominios_bloqueados = Endereco.objects.filter(
-        tipo="URL",
-        status=True
-    ).count()
-
-    ips_bloqueados = Endereco.objects.filter(
-        tipo__in=["IPv4", "IPv6"],
-        status=True
-    ).count()
-
     context = {
         "enderecos": enderecos,
-        "search_query": search_query,
-        "tipo_filter": tipo_filter,
-        "status_filter": status_filter,
-
-        # ➕ novos dados
-        "dominios_bloqueados": dominios_bloqueados,
-        "ips_bloqueados": ips_bloqueados,
+        "dominios_bloqueados": contar_urls_bloqueadas(),
+        "ips_bloqueados": contar_ips_bloqueados(),
     }
 
     return render(request, "enderecos/listar_enderecos.html", context)
