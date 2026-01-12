@@ -51,20 +51,16 @@ def listar_enderecos(request):
 def detectar_tipo(endereco):
     try:
         ip = ipaddress.ip_address(endereco)
-        if ip.version == 4:
-            return "IPv4"
-        else:
-            return "IPv6"
+        return "ipv4" if ip.version == 4 else "ipv6"
     except ValueError:
-        # Se não for IP, vamos tentar considerar como URL
         try:
             result = urlparse(endereco)
             if result.scheme and result.netloc:
-                return "URL"
+                return "url"
         except:
             pass
-    # Padrão se não for nem IP nem URL
-    return "DESCONHECIDO"
+    return "desconhecido"
+
 
 
 @allowed_roles(['admin', 'engredes'])
