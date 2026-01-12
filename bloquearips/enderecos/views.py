@@ -21,6 +21,7 @@ def listar_enderecos(request):
 
     enderecos = Endereco.objects.all()
 
+    # 🔍 filtros da tabela (mantém como está)
     if search_query:
         enderecos = enderecos.filter(
             Q(endereco__icontains=search_query) |
@@ -33,13 +34,30 @@ def listar_enderecos(request):
     if status_filter:
         enderecos = enderecos.filter(status=status_filter == "bloqueado")
 
+    # 📊 CONTADORES (independentes dos filtros)
+    dominios_bloqueados = Endereco.objects.filter(
+        tipo="URL",
+        status=True
+    ).count()
+
+    ips_bloqueados = Endereco.objects.filter(
+        tipo__in=["IPv4", "IPv6"],
+        status=True
+    ).count()
+
     context = {
         "enderecos": enderecos,
         "search_query": search_query,
         "tipo_filter": tipo_filter,
         "status_filter": status_filter,
+
+        # ➕ novos dados
+        "dominios_bloqueados": dominios_bloqueados,
+        "ips_bloqueados": ips_bloqueados,
     }
+
     return render(request, "enderecos/listar_enderecos.html", context)
+
 
 
 def detectar_tipo(endereco):
