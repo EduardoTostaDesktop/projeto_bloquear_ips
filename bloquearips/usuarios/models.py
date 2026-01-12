@@ -14,6 +14,11 @@ class Usuario(AbstractUser):
         default="noc"
     )
 
+    def save(self, *args, **kwargs):
+        if self.tipo == "admin":
+            self.is_staff = True
+        super().save(*args, **kwargs)
+
     def is_noc(self):
         return self.tipo == "noc"
 

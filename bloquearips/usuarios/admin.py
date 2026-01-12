@@ -10,6 +10,7 @@ class UsuarioAdmin(UserAdmin):
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         ("Informações pessoais", {"fields": ("first_name", "last_name", "email")}),
+        ("Tipo de usuário", {"fields": ("tipo",)}),  # 👈 AQUI
         ("Permissões", {
             "fields": (
                 "is_active",
@@ -27,17 +28,16 @@ class UsuarioAdmin(UserAdmin):
             "classes": ("wide",),
             "fields": (
                 "username",
+                "email",
+                "tipo",          # 👈 E AQUI
                 "password1",
                 "password2",
                 "is_staff",
                 "is_superuser",
-                "groups",
             ),
         }),
     )
 
-    list_display = ("username", "email", "is_staff", "is_superuser")
+    list_display = ("username", "email", "tipo", "is_staff", "is_superuser")
     search_fields = ("username", "email")
     ordering = ("username",)
-
-    filter_horizontal = ("groups", "user_permissions")
