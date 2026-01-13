@@ -33,15 +33,28 @@ def listar_enderecos(request):
             Q(desc__icontains=search_query) |
             Q(obs__icontains=search_query)
         )
+
     if tipo_filter:
         enderecos = enderecos.filter(tipo=tipo_filter)
+
     if status_filter:
         enderecos = enderecos.filter(status=status_filter == "bloqueado")
 
+    # 🔢 CONTADORES (AQUI ESTÁ O SEGREDO)
+    dominios_bloqueados = Endereco.objects.filter(
+        tipo="url",
+        status=True
+    ).count()
+
+    ips_bloqueados = Endereco.objects.filter(
+        tipo__in=["ipv4", "ipv6"],
+        status=True
+    ).count()
+
     context = {
         "enderecos": enderecos,
-        "dominios_bloqueados": contar_urls_bloqueadas(),
-        "ips_bloqueados": contar_ips_bloqueados(),
+        "dominios_bloqueados": dominios_bloqueados,
+        "ips_bloqueados": ips_bloqueados,
     }
 
     return render(request, "enderecos/listar_enderecos.html", context)
