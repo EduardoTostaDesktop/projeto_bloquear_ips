@@ -2,9 +2,15 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from .models import Usuario
 from .forms import UsuarioCreateForm
-from .decorators import admin_required, engredes_required
+from .decorators import admin_required
+from django.contrib.auth.decorators import login_required
 
 # Apenas administradores podem cadastrar usuários
+@login_required
+def perfil(request):
+    return render(request, "usuarios/perfil.html", {
+        "usuario": request.user
+    })
 
 @admin_required
 def cadastrar_usuario(request):

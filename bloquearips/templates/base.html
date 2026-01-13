@@ -32,12 +32,14 @@
                     <span class="text-sm font-medium">{{ user.username }}</span>
                     <form method="POST" action="{% url 'logout' %}">
                         {% csrf_token %}
-                        <button type="submit" class="text-sm hover:underline">Logout</button>
+                        <button type="submit" class="text-sm hover:underline cursor-pointer">Logout</button>
                     </form>
                 </div>
                 
                 <!-- Ícone de perfil -->
-                <img src="{% static 'images/perfil.png' %}" alt="Perfil" class="h-8 w-8 rounded-full border-2 border-white">
+                 <a href="{% url 'perfil' %}" class="hover:underline">
+                    <img src="{% static 'images/perfil.png' %}" alt="Perfil" class="h-8 w-8 rounded-full border-2 border-white">
+                </a>
             </div>
             {% else %}
                 <a href="{% url 'login' %}" class="px-3 hover:underline">Login</a>

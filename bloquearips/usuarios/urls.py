@@ -10,5 +10,6 @@ urlpatterns = [
     path('editar/<int:usuario_id>/', views.editar_usuario, name='editar_usuario'),
     path('excluir/<int:usuario_id>/', views.excluir_usuario, name='excluir_usuario'),
     path("excluir-massa/", views.excluir_usuarios_massa, name="excluir_usuarios_massa"),  # <- NOVA ROTA
+    path("perfil/", views.perfil, name="perfil"),
 
 ]
