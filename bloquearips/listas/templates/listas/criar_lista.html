@@ -16,13 +16,31 @@
             <input type="text" name="nome" required class="w-full p-2 border rounded" placeholder="Ex: Lista de Bloqueio Agosto">
         </div>
 
-        <div class="mb-4">
+        <!-- Solicitante -->
+        <div>
             <label class="block font-semibold mb-1">Solicitante</label>
-            <select name="solicitante" required class="w-full p-2 border rounded">
-                {% for solicitante in solicitantes %}
-                <option value="{{ solicitante.id }}">{{ solicitante.nome }}</option>
+            <select name="solicitante" id="solicitante_existente"
+                    class="border rounded px-3 py-2 w-full">
+                <option value="">-- Criar novo solicitante --</option>
+                {% for s in solicitantes %}
+                    <option value="{{ s.id }}">{{ s.nome }}</option>
                 {% endfor %}
             </select>
+        </div>
+
+        <!-- Campos de novo solicitante -->
+        <div id="novo_solicitante_campos" class="hidden">
+            <div class="mt-3">
+                <label class="block font-semibold mb-1">Nome do Solicitante</label>
+                <input type="text" name="nome_solicitante"
+                    class="border rounded px-3 py-2 w-full">
+            </div>
+
+            <div class="mt-3">
+                <label class="block font-semibold mb-1">Contato do Solicitante</label>
+                <input type="text" name="contato_solicitante"
+                    class="border rounded px-3 py-2 w-full">
+            </div>
         </div>
 
         <div class="mb-4">
@@ -53,4 +71,33 @@
     </form>
 
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const selectSolicitante = document.getElementById("solicitante_existente");
+    const novoSolicitanteCampos = document.getElementById("novo_solicitante_campos");
+
+    function toggleNovoSolicitante() {
+        if (selectSolicitante.value === "") {
+            // Criar novo solicitante
+            novoSolicitanteCampos.style.display = "block";
+        } else {
+            // Usar solicitante existente
+            novoSolicitanteCampos.style.display = "none";
+
+            // limpa campos para evitar envio indevido
+            novoSolicitanteCampos.querySelectorAll("input").forEach(input => {
+                input.value = "";
+            });
+        }
+    }
+
+    // dispara ao carregar a página
+    toggleNovoSolicitante();
+
+    // dispara ao mudar o select
+    selectSolicitante.addEventListener("change", toggleNovoSolicitante);
+});
+</script>
+
 {% endblock %}

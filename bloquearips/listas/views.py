@@ -20,16 +20,28 @@ def detalhar_lista(request, lista_id):
 def criar_lista(request):
     if request.method == 'POST':
         nome = request.POST.get('nome')
-        solicitante_id = request.POST.get('solicitante')
+        solicitante = request.POST.get('solicitante')
+        novo_solicitante_nome = request.POST.get("nome_solicitante")
+        novo_solicitante_contato = request.POST.get("contato_solicitante")
         desc = request.POST.get('desc')
         obs = request.POST.get('obs')
         data_prevista_desbloqueio = request.POST.get('data_prevista_desbloqueio')
         arquivo = request.FILES.get('arquivo_csv')
         criador = request.user
 
-        if not solicitante_id:
-            messages.error(request, "Selecione um solicitante válido.")
-            return redirect('listas:criar_lista')
+        # --- Seleciona ou cria solicitante ---
+        if novo_solicitante_nome and novo_solicitante_nome.strip() != "":
+            solicitante, created = Solicitante.objects.get_or_create(
+                nome=novo_solicitante_nome.strip(),
+                defaults={"contato": novo_solicitante_contato.strip() if novo_solicitante_contato else ""}
+            )
+            if created:
+                messages.success(request, f"Novo solicitante '{novo_solicitante_nome}' cadastrado com sucesso!")
+        elif solicitante and solicitante.strip() != "":
+            solicitante = get_object_or_404(Solicitante, id=solicitante)
+        else:
+            messages.error(request, "Você deve selecionar um solicitante ou cadastrar um novo.")
+            return redirect("listas:criar_lista")
 
         from datetime import datetime
         if data_prevista_desbloqueio:
@@ -43,7 +55,7 @@ def criar_lista(request):
 
         lista = Lista.objects.create(
             nome=nome,
-            solicitante_id=solicitante_id,
+            solicitante=solicitante,
             desc=desc,
             obs=obs,
             criador=criador,
@@ -83,7 +95,7 @@ def editar_lista(request, lista_id):
 
     if request.method == 'POST':
         lista.nome = request.POST.get('nome')
-        lista.solicitante_id = request.POST.get('solicitante')
+        lista.solicitante = request.POST.get('solicitante')
         lista.desc = request.POST.get('desc')
         lista.obs = request.POST.get('obs')
         lista.data_prevista_desbloqueio = request.POST.get('data_prevista_desbloqueio') or None
