@@ -61,7 +61,7 @@
             <span class="font-semibold text-lg">Endereços:</span>
             <div class="border rounded p-3 max-h-64 overflow-y-auto bg-gray-50">
                 <ul class="list-disc list-inside space-y-1">
-                    {% for endereco in lista.enderecos.all %}
+                    {% for endereco in solicitacao.lista.enderecos.all %}
                         <li>
                             <span class="font-mono">{{ endereco.endereco }}</span>
                             {% if endereco.status == "bloqueado" %}
