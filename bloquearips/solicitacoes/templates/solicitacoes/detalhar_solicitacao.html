@@ -58,23 +58,29 @@
 
         <!-- Lista de Endereços com tamanho fixo e barra de rolagem -->
         <div>
-            <span class="font-semibold">Endereços:</span>
-            <div class="border rounded p-2 max-h-48 overflow-y-auto bg-gray-50">
-                <ul class="list-disc list-inside">
-                    {% for endereco in solicitacao.lista.enderecos.all %}
-                        <li>{{ endereco.endereco }} - 
-                            {% if endereco.status %}
-                                <span class="text-red-600 font-semibold">Bloqueado</span>
-                            {% else %}
-                                <span class="text-green-600 font-semibold">Desbloqueado</span>
+            <span class="font-semibold text-lg">Endereços:</span>
+            <div class="border rounded p-3 max-h-64 overflow-y-auto bg-gray-50">
+                <ul class="list-disc list-inside space-y-1">
+                    {% for endereco in lista.enderecos.all %}
+                        <li>
+                            <span class="font-mono">{{ endereco.endereco }}</span>
+                            {% if endereco.status == "bloqueado" %}
+                                <span class="text-red-600 font-semibold">(Bloqueado)</span>
+
+                            {% elif endereco.status == "desbloqueado" %}
+                                <span class="text-green-600 font-semibold">(Desbloqueado)</span>
+
+                            {% elif endereco.status == "excluido" %}
+                                <span class="text-gray-500 font-semibold">(Excluído)</span>
                             {% endif %}
                         </li>
                     {% empty %}
-                        <li>Nenhum endereço na lista.</li>
+                        <li>Nenhum endereço cadastrado.</li>
                     {% endfor %}
                 </ul>
             </div>
         </div>
+
 
         <div class="flex justify-end">
             <a href="{% url 'solicitacoes:listar_solicitacoes' %}" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">

@@ -24,7 +24,7 @@ def listar_enderecos(request):
     tipo_filter = request.GET.get("tipo", "")
     status_filter = request.GET.get("status", "")
 
-    enderecos = Endereco.objects.all()
+    enderecos = Endereco.objects.exclude(status="excluido")
 
     if search_query:
         enderecos = enderecos.filter(
@@ -40,15 +40,15 @@ def listar_enderecos(request):
     if status_filter:
         enderecos = enderecos.filter(status=status_filter == "bloqueado")
 
-    # 🔢 CONTADORES (AQUI ESTÁ O SEGREDO)
+    # 🔢 CONTADORES
     dominios_bloqueados = Endereco.objects.filter(
         tipo="url",
-        status=True
+        status="bloqueado"
     ).count()
 
     ips_bloqueados = Endereco.objects.filter(
         tipo__in=["ipv4", "ipv6"],
-        status=True
+        status="bloqueado"
     ).count()
 
     context = {
@@ -56,6 +56,7 @@ def listar_enderecos(request):
         "dominios_bloqueados": dominios_bloqueados,
         "ips_bloqueados": ips_bloqueados,
     }
+
 
     return render(request, "enderecos/listar_enderecos.html", context)
 
@@ -84,11 +85,11 @@ def massa_enderecos(request):
 
         if ids:
             if acao == 'bloquear':
-                Endereco.objects.filter(id__in=ids).update(status=True)
+                Endereco.objects.filter(id__in=ids).update(status="bloqueado")
             elif acao == 'desbloquear':
-                Endereco.objects.filter(id__in=ids).update(status=False)
+                Endereco.objects.filter(id__in=ids).update(status="desbloqueado")
             elif acao == 'excluir':
-                Endereco.objects.filter(id__in=ids).delete()
+                Endereco.objects.filter(id__in=ids).update(status="excluido")
             messages.success(request, f'Ação "{acao}" realizada com sucesso!')
         else:
             messages.warning(request, "Nenhum endereço selecionado para ação.")
@@ -129,7 +130,8 @@ def editar_endereco(request, endereco_id):
 @allowed_roles(['admin', 'engredes'])
 def excluir_endereco(request, endereco_id):
     endereco = get_object_or_404(Endereco, id=endereco_id)
-    endereco.delete()
+    endereco.status = "excluido"
+    endereco.save()
     messages.success(request, "Endereço excluído com sucesso!")
     return redirect("listar_enderecos")
 

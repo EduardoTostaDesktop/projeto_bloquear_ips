@@ -45,10 +45,14 @@
                     {% for endereco in lista.enderecos.all %}
                         <li>
                             <span class="font-mono">{{ endereco.endereco }}</span>
-                            {% if endereco.status %}
+                            {% if endereco.status == "bloqueado" %}
                                 <span class="text-red-600 font-semibold">(Bloqueado)</span>
-                            {% else %}
+
+                            {% elif endereco.status == "desbloqueado" %}
                                 <span class="text-green-600 font-semibold">(Desbloqueado)</span>
+
+                            {% elif endereco.status == "excluido" %}
+                                <span class="text-gray-500 font-semibold">(Excluído)</span>
                             {% endif %}
                         </li>
                     {% empty %}

@@ -8,10 +8,19 @@ class Endereco(models.Model):
         ("ipv6", "IPv6"),
         ("url", "URL"),
     ]
+    STATUS_CHOICES = [
+        ("bloqueado", "Bloqueado"),
+        ("desbloqueado", "Desbloqueado"),
+        ("excluido", "Excluído"),
+    ]
 
     endereco = models.CharField(max_length=100, unique=True)
     tipo = models.CharField(max_length=10, choices=TIPOS, editable=False)
-    status = models.BooleanField(default=False)  # False = desbloqueado, True = bloqueado
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="desbloqueado"
+    )  
     nome = models.CharField(max_length=100, blank=True, null=True)
     desc = models.TextField(blank=True, null=True)
     obs = models.TextField(blank=True, null=True)
@@ -34,4 +43,4 @@ class Endereco(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.endereco} ({self.tipo}) - {'Bloqueado' if self.status else 'Desbloqueado'}"
+        return f"{self.endereco} ({self.tipo}) - {self.get_status_display()}"

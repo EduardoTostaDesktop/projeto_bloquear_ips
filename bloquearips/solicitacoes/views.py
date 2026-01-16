@@ -148,34 +148,34 @@ def criar_solicitacao(request):
             lista.save()
 
         # --- Atualiza status dos endereços ---
-        novo_status = tipo == "BLOQUEIO"
+        novo_status = "BLOQUEADO" if tipo == "BLOQUEIO" else "DESBLOQUEADO"
+
         alterados = 0
         for endereco in enderecos_solicitacao:
             if endereco.status != novo_status:
                 endereco.status = novo_status
-                endereco.data_desbloqueio = data_prevista_obj if novo_status else None
+                endereco.data_desbloqueio = (
+                    data_prevista_obj if novo_status == "BLOQUEADO" else None
+                )
                 endereco.save()
                 alterados += 1
 
         if alterados:
             messages.success(
                 request,
-                f"{alterados} endereço(s) {'bloqueado(s)' if novo_status else 'desbloqueado(s)'} com sucesso!"
+                f"{alterados} endereço(s) "
+                f"{'bloqueado(s)' if novo_status == 'BLOQUEADO' else 'desbloqueado(s)'} "
+                "com sucesso!"
             )
         else:
             messages.warning(
                 request,
-                f"Todos os endereços selecionados já estavam {'bloqueados' if novo_status else 'desbloqueados'}."
+                "Todos os endereços selecionados já estavam "
+                f"{'bloqueados' if novo_status == 'BLOQUEADO' else 'desbloqueados'}."
             )
 
         return redirect("solicitacoes:listar_solicitacoes")
 
-    # GET
-    return render(request, "solicitacoes/criar_solicitacao.html", {
-        "solicitantes": solicitantes,
-        "listas": listas,
-        "enderecos": enderecos
-    })
 
 
 @allowed_roles(['admin', 'engredes'])

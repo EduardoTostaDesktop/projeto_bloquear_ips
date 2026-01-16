@@ -132,10 +132,12 @@
                             data-status="desbloqueado"
                         {% endif %}
                     >
-                        {% if endereco.status %}
-                            <span class="text-red-600 font-bold">Bloqueado</span>
-                        {% else %}
-                            <span class="text-green-600 font-bold">Desbloqueado</span>
+                        {% if endereco.status == "bloqueado" %}
+                            <span class="text-red-600 font-semibold">(Bloqueado)</span>
+                        {% elif endereco.status == "desbloqueado" %}
+                            <span class="text-green-600 font-semibold">(Desbloqueado)</span>
+                        {% elif endereco.status == "excluido" %}
+                            <span class="text-gray-500 font-semibold">(Excluído)</span>
                         {% endif %}
                     </td>
 
