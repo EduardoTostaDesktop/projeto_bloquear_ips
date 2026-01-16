@@ -31,11 +31,11 @@
     </div>
 
     <!-- Filtros -->
-    <div class="w-full md:w-1/2 mb-6 flex space-x-2">
+    <div class="w-full md:w-1/2 mb-6 flex space-x-2 space-y-2">
         <!-- Input de busca -->
         <div class="flex-1 my-2 p-1 bg-white flex border border-gray-200 rounded">
             <input 
-                placeholder="Buscar por endereço, nome ou descrição" 
+                placeholder="Buscar por endereço" 
                 class="p-2 appearance-none outline-none w-full text-gray-800"
                 id="searchInput"
                 oninput="filterTable()" 
@@ -104,7 +104,15 @@
             </thead>
             <tbody id="enderecosTable" class="text-sm sm:text-base">
                 {% for endereco in enderecos %}
-                <tr class="border-b hover:bg-gray-100">
+                <tr class="border-b hover:bg-gray-100"
+                    data-endereco="{{ endereco.endereco|default_if_none:''|lower }}"
+                    data-tipo="{{ endereco.tipo|lower }}"
+                    data-status="{% if endereco.status %}bloqueado{% else %}desbloqueado{% endif %}"
+                    data-nome="{{ endereco.nome|default_if_none:''|lower }}"
+                    data-desc="{{ endereco.desc|default_if_none:''|lower }}"
+                    data-obs="{{ endereco.obs|default_if_none:''|lower }}"
+                >
+
                     {% if request.user.tipo != "noc" %} 
                     <td class="py-2 px-3 sm:px-6">
                         <input type="checkbox" class="selectRow" name="ids" value="{{ endereco.id }}" data-nome="{{ endereco.endereco }}">
@@ -157,26 +165,32 @@ function confirmDelete(enderecoId) {
 }
 
 function filterTable() {
-    const input = document.getElementById('searchInput').value.toLowerCase();
-    const tipo = document.getElementById('tipoFilter').value.toLowerCase();
+    const input  = document.getElementById('searchInput').value.toLowerCase();
+    const tipo   = document.getElementById('tipoFilter').value.toLowerCase();
     const status = document.getElementById('statusFilter').value.toLowerCase();
+
     const rows = document.querySelectorAll('#enderecosTable tr');
 
     rows.forEach(row => {
-        const enderecoText = row.cells[1]?.textContent.trim().toLowerCase() || '';
-        const tipoText = row.cells[2]?.textContent.trim().toLowerCase() || '';
-        const nomeText = row.cells[3]?.textContent.trim().toLowerCase() || '';
-        const descText = row.cells[4]?.textContent.trim().toLowerCase() || '';
-        const obsText = row.cells[5]?.textContent.trim().toLowerCase() || '';
+        const endereco = row.dataset.endereco || '';
+        const nome     = row.dataset.nome || '';
+        const desc     = row.dataset.desc || '';
+        const obs      = row.dataset.obs || '';
+        const rowTipo  = row.dataset.tipo || '';
+        const rowStatus= row.dataset.status || '';
 
-        let statusText = row.cells[6]?.dataset.status || '';
-        statusText = statusText.toLowerCase();
+        const matchesText =
+            endereco.includes(input) ||
+            nome.includes(input) ||
+            desc.includes(input) ||
+            obs.includes(input);
 
-        const matchesText = enderecoText.includes(input) || nomeText.includes(input) || descText.includes(input) || obsText.includes(input);
-        const matchesTipo = tipo === "" || tipoText === tipo;
-        const matchesStatus = status === "" || statusText === status;
+        const matchesTipo   = tipo === "" || rowTipo === tipo;
+        const matchesStatus = status === "" || rowStatus === status;
 
-        row.style.display = (matchesText && matchesTipo && matchesStatus) ? '' : 'none';
+        row.style.display = (matchesText && matchesTipo && matchesStatus)
+            ? ''
+            : 'none';
     });
 }
 
