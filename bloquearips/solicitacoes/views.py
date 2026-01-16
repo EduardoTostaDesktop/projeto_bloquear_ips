@@ -175,6 +175,13 @@ def criar_solicitacao(request):
             )
 
         return redirect("solicitacoes:listar_solicitacoes")
+    
+    return render(request, "solicitacoes/criar_solicitacao.html", {
+    "solicitantes": solicitantes,
+    "listas": listas,
+    "enderecos": enderecos,
+})
+
 
 
 
