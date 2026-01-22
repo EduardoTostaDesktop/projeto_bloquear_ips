@@ -148,7 +148,7 @@ def criar_solicitacao(request):
             lista.save()
 
         # --- Atualiza status dos endereços ---
-        novo_status = "BLOQUEADO" if tipo == "BLOQUEIO" else "DESBLOQUEADO"
+        novo_status = "bloqueado" if tipo == "BLOQUEIO" else "desbloqueado"
 
         alterados = 0
         for endereco in enderecos_solicitacao:
