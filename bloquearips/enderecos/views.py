@@ -114,17 +114,29 @@ def cadastrar_endereco(request):
 @allowed_roles(['admin', 'engredes'])
 def editar_endereco(request, endereco_id):
     endereco = get_object_or_404(Endereco, id=endereco_id)
+
     if request.method == "POST":
         form = EnderecoForm(request.POST, instance=endereco)
+
         if form.is_valid():
             endereco_obj = form.save(commit=False)
             endereco_obj.tipo = detectar_tipo(endereco_obj.endereco)
             endereco_obj.save()
+
             messages.success(request, "Endereço atualizado com sucesso!")
             return redirect("listar_enderecos")
+        else:
+            print("❌ FORM INVÁLIDO")
+            print(form.errors)  # 🔥 ISSO É O MAIS IMPORTANTE
     else:
         form = EnderecoForm(instance=endereco)
-    return render(request, "enderecos/form_endereco.html", {"form": form, "titulo": "Editar Endereço"})
+
+    return render(
+        request,
+        "enderecos/form_endereco.html",
+        {"form": form, "titulo": "Editar Endereço"}
+    )
+
 
 
 @allowed_roles(['admin', 'engredes'])
