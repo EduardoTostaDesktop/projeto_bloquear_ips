@@ -94,6 +94,7 @@
                     <th class="py-3 px-3 sm:px-6 text-left">Endereço</th>
                     <th class="py-3 px-3 sm:px-6 text-left">Tipo</th>
                     <th class="py-3 px-3 sm:px-6 text-left hidden sm:table-cell">Nome</th>
+                    <th class="py-3 px-3 text-center hidden md:table-cell">Última solicitação</th>
                     <th class="py-3 px-3 sm:px-6 text-left hidden md:table-cell">Descrição</th>
                     <th class="py-3 px-3 sm:px-6 text-left hidden lg:table-cell">Observação</th>
                     <th class="py-3 px-3 sm:px-6 text-center">Status</th>
@@ -123,6 +124,13 @@
                     </td>
                     <td class="py-2 px-3 sm:px-6">{{ endereco.tipo|upper }}</td>
                     <td class="py-2 px-3 sm:px-6 hidden sm:table-cell truncate max-w-[100px]" title="{{ endereco.nome }}">{{ endereco.nome|default_if_none:""|truncatechars:15 }}</td>
+                    <td class="py-2 px-3 text-center hidden md:table-cell">
+                        {% if endereco.data_ultima_solicitacao %}
+                            {{ endereco.data_ultima_solicitacao|date:"d/m/Y H:i" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
                     <td class="py-2 px-3 sm:px-6 hidden md:table-cell truncate max-w-[150px]" title="{{ endereco.desc }}">{{ endereco.desc|default_if_none:""|truncatechars:20 }}</td>
                     <td class="py-2 px-3 sm:px-6 hidden lg:table-cell truncate max-w-[150px]" title="{{ endereco.obs }}">{{ endereco.obs|default_if_none:""|truncatechars:20 }}</td>
                     <td class="py-2 px-3 sm:px-6 text-center" data-status="{{ endereco.status|lower }}">

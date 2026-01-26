@@ -21,6 +21,11 @@ class Endereco(models.Model):
         choices=STATUS_CHOICES,
         default="desbloqueado"
     )  
+    data_ultima_solicitacao = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Data da última solicitação"
+    )
     nome = models.CharField(max_length=100, blank=True, null=True)
     desc = models.TextField(blank=True, null=True)
     obs = models.TextField(blank=True, null=True)

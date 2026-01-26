@@ -26,6 +26,9 @@
         {% if endereco.obs %}
             <p><strong>Observação:</strong> {{ endereco.obs }}</p>
         {% endif %}
+        {% if endereco.data_ultima_solicitacao %}
+            <p><strong>Última alteração de status:</strong> {{ endereco.data_ultima_solicitacao|date:"d/m/Y H:i" }}</p>
+        {% endif %}
         {% if endereco.data_desbloqueio %}
             <p><strong>Data prevista para desbloqueio:</strong> {{ endereco.data_desbloqueio }}</p>
         {% endif %}

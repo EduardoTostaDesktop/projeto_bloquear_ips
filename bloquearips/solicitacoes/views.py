@@ -154,6 +154,7 @@ def criar_solicitacao(request):
         for endereco in enderecos_solicitacao:
             if endereco.status != novo_status:
                 endereco.status = novo_status
+                endereco.data_ultima_solicitacao = datetime.now()
                 endereco.data_desbloqueio = (
                     data_prevista_obj if novo_status == "BLOQUEADO" else None
                 )
