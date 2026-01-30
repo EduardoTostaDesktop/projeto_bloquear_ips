@@ -7,11 +7,28 @@ from django.shortcuts import get_object_or_404, redirect, render
 from usuarios.decorators import allowed_roles
 from enderecos.forms import EnderecoForm
 from enderecos.models import Endereco
+from django.db.models import Prefetch
+from solicitacoes.models import Solicitacao
 
 @login_required
 def perfil_endereco(request, endereco_id):
     endereco = get_object_or_404(Endereco, id=endereco_id)
-    return render(request, "enderecos/perfil_endereco.html", {"endereco": endereco})
+
+    solicitacoes = (
+        Solicitacao.objects
+        .filter(lista__enderecos=endereco)
+        .select_related("lista", "solicitante")
+        .order_by("-data_criacao")
+    )
+
+    return render(
+        request,
+        "enderecos/perfil_endereco.html",
+        {
+            "endereco": endereco,
+            "solicitacoes": solicitacoes,
+        }
+    )
 
 from enderecos.utils import (
     contar_ips_bloqueados,
