@@ -1,0 +1,24 @@
+########################################
+# SCRIPT DE DESBLOQUEIO
+########################################
+
+Solicitação: {{ solicitacao.id }}
+Tipo: {{ solicitacao.tipo }}
+Solicitante: {{ solicitacao.solicitante.nome }}
+Lista: {{ solicitacao.lista.nome }}
+Criado por: {{ solicitacao.criado_por }}
+Data de geração: {{ data }}
+
+----------------------------------------
+ENDEREÇOS PARA DESBLOQUEIO
+----------------------------------------
+
+{% for endereco in enderecos %}
+- {{ endereco.endereco }}
+{% empty %}
+(Nenhum endereço encontrado)
+{% endfor %}
+
+----------------------------------------
+FIM DO SCRIPT
+----------------------------------------

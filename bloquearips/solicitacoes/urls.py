@@ -10,4 +10,6 @@ urlpatterns = [
     path("editar/<int:solicitacao_id>/", views.editar_solicitacao, name="editar_solicitacao"),
     path('excluir/<int:solicitacao_id>/', views.excluir_solicitacao, name='excluir_solicitacao'),
     path('excluir-massa/', views.excluir_solicitacoes_massa, name='excluir_solicitacoes_massa'),
+    path("gerar-script/<int:solicitacao_id>/", views.gerar_script, name="gerar_script" ),
+
 ]

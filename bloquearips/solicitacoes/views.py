@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 import openpyxl
 from datetime import date, datetime
 from django.utils import timezone
@@ -8,6 +9,7 @@ from .models import Solicitacao
 from listas.models import Lista
 from solicitantes.models import Solicitante
 from enderecos.models import Endereco
+from django.template.loader import render_to_string
 
 
 @allowed_roles(['admin', 'engredes'])
@@ -199,7 +201,10 @@ def editar_solicitacao(request, solicitacao_id):
         if data_prevista:
             try:
                 # Converte a data para objeto datetime com timezone
-                data_prevista_obj = timezone.make_aware(datetime.strptime(data_prevista, "%Y-%m-%d"))
+                data_prevista_obj = timezone.make_aware(
+                    datetime.strptime(data_prevista, "%Y-%m-%d")
+                )
+
 
                 # --- VALIDAÇÃO ---
                 if data_prevista_obj < solicitacao.data_criacao:
@@ -255,3 +260,28 @@ def excluir_solicitacoes_massa(request):
         else:
             messages.warning(request, "Nenhuma solicitação selecionada para exclusão.")
     return redirect('solicitacoes:listar_solicitacoes')
+
+
+@allowed_roles(['admin', 'engredes'])
+def gerar_script(request, solicitacao_id):
+    solicitacao = get_object_or_404(Solicitacao, id=solicitacao_id)
+
+    template = (
+        "solicitacoes/scripts/bloqueio.txt"
+        if solicitacao.tipo == "BLOQUEIO"
+        else "solicitacoes/scripts/desbloqueio.txt"
+    )
+
+
+    content = render_to_string(template, {
+        "solicitacao": solicitacao,
+        "enderecos": solicitacao.lista.enderecos.all(),
+        "data": timezone.localtime().strftime("%d/%m/%Y %H:%M"),
+    })
+
+    response = HttpResponse(content, content_type="text/plain")
+    response["Content-Disposition"] = (
+        f'attachment; filename="solicitacao_{solicitacao.id}.txt"'
+    )
+
+    return response
