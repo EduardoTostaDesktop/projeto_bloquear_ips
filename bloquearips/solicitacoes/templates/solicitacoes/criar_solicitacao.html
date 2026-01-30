@@ -67,14 +67,14 @@
                 <div x-data="dataFileDnD()" class="relative flex flex-col p-4 text-gray-400 border border-gray-200 rounded">
                     <div x-ref="dnd"
                         class="relative flex flex-col text-gray-400 border border-gray-200 border-dashed rounded cursor-pointer">
-                        <input accept=".xlsx" type="file" name="arquivo" 
-                            class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
+                        <input
+                            x-ref="fileInput"
+                            type="file"
+                            name="arquivo"
+                            accept=".xlsx"
+                            class="absolute inset-0 z-50 w-full h-full opacity-0 cursor-pointer"
                             @change="addFiles($event)"
-                            @dragover="$refs.dnd.classList.add('border-blue-400', 'ring-4', 'ring-inset')"
-                            @dragleave="$refs.dnd.classList.remove('border-blue-400', 'ring-4', 'ring-inset')"
-                            @drop="$refs.dnd.classList.remove('border-blue-400', 'ring-4', 'ring-inset')"
-                            title="Arraste ou clique para selecionar o arquivo" />
-
+                        >
                         <div class="flex flex-col items-center justify-center py-10 text-center">
                             <svg class="w-6 h-6 mr-1 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -87,16 +87,30 @@
                     </div>
 
                     <template x-if="files.length > 0">
-                        <div class="grid grid-cols-1 gap-4 mt-4 md:grid-cols-3">
-                            <template x-for="(_, index) in Array.from({ length: files.length })" :key="index">
-                                <div class="relative flex flex-col items-center overflow-hidden text-center bg-gray-100 border rounded p-2">
-                                    <button class="absolute top-0 right-0 p-1 bg-white rounded-bl focus:outline-none" type="button"
-                                        @click="remove(index)">
-                                    </button>
-                                    <div class="text-xs truncate" x-text="files[index].name"></div>
-                                    <div class="text-xs text-gray-500" x-text="humanFileSize(files[index].size)"></div>
-                                </div>
-                            </template>
+                        <div class="mt-4">
+
+                            <!-- Sinalizador -->
+                            <p class="text-green-600 text-sm mb-2">
+                                ✔ Arquivo carregado com sucesso
+                            </p>
+
+                            <!-- Grid SOMENTE para arquivos -->
+                            <div class="grid grid-cols-1 gap-4">
+                                <template x-for="(file, index) in files" :key="index">
+                                    <div class="relative flex flex-col items-center overflow-hidden text-center bg-gray-100 border rounded p-2">
+                                        <button
+                                            type="button"
+                                            class="absolute top-0 right-0 p-1 bg-white rounded-bl"
+                                            @click="remove(index)"
+                                        >
+                                            ✕
+                                        </button>
+
+                                        <div x-text="file.name"></div>
+                                        <div x-text="humanFileSize(file.size)"></div>
+                                    </div>
+                                </template>
+                            </div>
                         </div>
                     </template>
                 </div>
@@ -130,47 +144,53 @@
     </form>
 </div>
 
-<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 <script src="https://unpkg.com/create-file-list"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", () => {
         const listaSelect = document.getElementById("lista_existente");
         const novaListaCampos = document.getElementById("nova_lista_campos");
+
         const solicitanteSelect = document.getElementById("solicitante_existente");
         const novoSolicitanteCampos = document.getElementById("novo_solicitante_campos");
 
         function toggleCamposLista() {
-            novaListaCampos.style.display = listaSelect.value === "" ? "block" : "none";
+            novaListaCampos.style.display =
+                !listaSelect.value ? "block" : "none";
         }
 
         function toggleCamposSolicitante() {
-            novoSolicitanteCampos.style.display = solicitanteSelect.value === "" ? "block" : "none";
+            novoSolicitanteCampos.style.display =
+                !solicitanteSelect.value ? "block" : "none";
         }
 
         listaSelect.addEventListener("change", toggleCamposLista);
         solicitanteSelect.addEventListener("change", toggleCamposSolicitante);
 
+        // 🔥 força estado inicial correto
         toggleCamposLista();
         toggleCamposSolicitante();
     });
-
+</script>
+<script>
     function dataFileDnD() {
-        return {
-            files: [],
-            humanFileSize(size) {
-                const i = Math.floor(Math.log(size) / Math.log(1024));
-                return (size / Math.pow(1024, i)).toFixed(2) + " " + ["B", "kB", "MB", "GB", "TB"][i];
-            },
-            remove(index) {
-                let files = [...this.files];
-                files.splice(index, 1);
-                this.files = createFileList(files);
-            },
-            addFiles(e) {
-                const files = createFileList([...this.files], [...e.target.files]);
-                this.files = files;
-            }
-        };
-    }
+    return {
+        files: [],
+        humanFileSize(size) {
+            return (size / 1024 / 1024).toFixed(2) + " MB";
+        },
+        remove(index) {
+            this.files = [];
+            this.$refs.fileInput.value = null;
+        },
+
+        addFiles(e) {
+            const selected = Array.from(e.target.files).slice(0, 1);
+            this.files.splice(0, this.files.length);
+            this.files.push(...selected);
+        }
+
+    };
+}
+
 </script>
 {% endblock %}
