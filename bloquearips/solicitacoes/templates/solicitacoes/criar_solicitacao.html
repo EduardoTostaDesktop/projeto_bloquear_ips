@@ -14,7 +14,7 @@
         <!-- Tipo -->
         <div>
             <label class="block font-semibold mb-1">Tipo</label>
-            <select name="tipo" class="border rounded px-3 py-2 w-full" required>
+            <select name="tipo" id="tipo_solicitacao" class="border rounded px-3 py-2 w-full" required>
                 <option value="BLOQUEIO">Bloqueio</option>
                 <option value="DESBLOQUEIO">Desbloqueio</option>
             </select>
@@ -118,7 +118,7 @@
         </div>
 
         <!-- Data prevista -->
-        <div>
+        <div id="campo_data_prevista">
             <label class="block font-semibold mb-1">Data Prevista</label>
             <input type="date" name="data_prevista" class="border rounded px-3 py-2 w-full">
         </div>
@@ -193,4 +193,24 @@
 }
 
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const tipoSelect = document.getElementById("tipo_solicitacao");
+    const campoDataPrevista = document.getElementById("campo_data_prevista");
+
+    function toggleDataPrevista() {
+        if (tipoSelect.value === "DESBLOQUEIO") {
+            campoDataPrevista.style.display = "none";
+        } else {
+            campoDataPrevista.style.display = "block";
+        }
+    }
+
+    tipoSelect.addEventListener("change", toggleDataPrevista);
+
+    // 🔥 garante estado correto ao carregar a página
+    toggleDataPrevista();
+});
+</script>
+
 {% endblock %}
