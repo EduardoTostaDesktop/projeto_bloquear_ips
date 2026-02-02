@@ -118,9 +118,9 @@
         </div>
 
         <!-- Data prevista -->
-        <div id="campo_data_prevista">
+        <div id="campo_data_prevista_desbloqueio">
             <label class="block font-semibold mb-1">Data Prevista</label>
-            <input type="date" name="data_prevista" class="border rounded px-3 py-2 w-full">
+            <input type="date" name="data_prevista_desbloqueio" class="border rounded px-3 py-2 w-full">
         </div>
 
         <!-- Descrição -->
@@ -196,7 +196,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const tipoSelect = document.getElementById("tipo_solicitacao");
-    const campoDataPrevista = document.getElementById("campo_data_prevista");
+    const campoDataPrevista = document.getElementById("campo_data_prevista_desbloqueio");
 
     function toggleDataPrevista() {
         if (tipoSelect.value === "DESBLOQUEIO") {

@@ -50,24 +50,24 @@ def criar_solicitacao(request):
         lista_existente_id = request.POST.get("lista_existente")
         nome_lista = request.POST.get("nome_lista")
         enderecos_ids = request.POST.getlist("enderecos")
-        data_prevista = request.POST.get("data_prevista")
+        data_prevista_desbloqueio = request.POST.get("data_prevista_desbloqueio")
         desc = request.POST.get("desc")
         obs = request.POST.get("obs")
         arquivo = request.FILES.get("arquivo")
 
-        data_prevista_obj = None
-        data_prevista = data_prevista.strip() if data_prevista else ""
+        data_prevista_desbloqueio_obj = None
+        data_prevista_desbloqueio = data_prevista_desbloqueio.strip() if data_prevista_desbloqueio else ""
 
-        if data_prevista:  # Só tenta validar se o usuário realmente preencheu algo
+        if data_prevista_desbloqueio:  # Só tenta validar se o usuário realmente preencheu algo
             try:
-                data_prevista_obj = datetime.strptime(data_prevista, "%Y-%m-%d").date()
+                data_prevista_desbloqueio_obj = datetime.strptime(data_prevista_desbloqueio, "%Y-%m-%d").date()
             except ValueError:
                 messages.error(request, "Data inválida!")
                 return redirect("solicitacoes:criar_solicitacao")
 
             # Se o usuário informou a data, valida se não é anterior ao dia atual
             hoje = date.today()
-            if data_prevista_obj < hoje:
+            if data_prevista_desbloqueio_obj < hoje:
                 messages.error(request, "A data prevista não pode ser anterior à data atual!")
                 return redirect("solicitacoes:criar_solicitacao")
 
@@ -97,7 +97,7 @@ def criar_solicitacao(request):
                 nome=nome_lista,
                 solicitante=solicitante,
                 criador=request.user,
-                data_prevista_desbloqueio=data_prevista_obj
+                data_prevista_desbloqueio_desbloqueio=data_prevista_desbloqueio_obj
             )
 
         # --- Monta os endereços que farão parte da solicitação ---
@@ -137,7 +137,7 @@ def criar_solicitacao(request):
             lista=lista,
             tipo=tipo,
             solicitante=solicitante,
-            data_prevista=data_prevista_obj,
+            data_prevista_desbloqueio=data_prevista_desbloqueio_obj,
             desc=desc,
             obs=obs,
             criado_por=request.user,
@@ -145,8 +145,8 @@ def criar_solicitacao(request):
         )
         
         # 🔹 Atualiza também a lista com a nova data, se houver
-        if data_prevista_obj:
-            lista.data_prevista_desbloqueio = data_prevista_obj
+        if data_prevista_desbloqueio_obj:
+            lista.data_prevista_desbloqueio_desbloqueio = data_prevista_desbloqueio_obj
             lista.save()
 
         # --- Atualiza status dos endereços ---
@@ -158,7 +158,7 @@ def criar_solicitacao(request):
                 endereco.status = novo_status
                 endereco.data_ultima_solicitacao = datetime.now()
                 endereco.data_desbloqueio = (
-                    data_prevista_obj if novo_status == "bloqueado" else None
+                    data_prevista_desbloqueio_obj if novo_status == "bloqueado" else None
                 )
                 endereco.save()
                 alterados += 1
@@ -197,17 +197,17 @@ def editar_solicitacao(request, solicitacao_id):
         solicitacao.obs = request.POST.get("obs", solicitacao.obs)
         solicitacao.desc = request.POST.get("desc", solicitacao.desc)
 
-        data_prevista = request.POST.get("data_prevista")
-        if data_prevista:
+        data_prevista_desbloqueio = request.POST.get("data_prevista_desbloqueio")
+        if data_prevista_desbloqueio:
             try:
                 # Converte a data para objeto datetime com timezone
-                data_prevista_obj = timezone.make_aware(
-                    datetime.strptime(data_prevista, "%Y-%m-%d")
+                data_prevista_desbloqueio_obj = timezone.make_aware(
+                    datetime.strptime(data_prevista_desbloqueio, "%Y-%m-%d")
                 )
 
 
                 # --- VALIDAÇÃO ---
-                if data_prevista_obj < solicitacao.data_criacao:
+                if data_prevista_desbloqueio_obj < solicitacao.data_criacao:
                     messages.error(
                         request,
                         "A data prevista não pode ser anterior à data de criação da solicitação!"
@@ -215,16 +215,16 @@ def editar_solicitacao(request, solicitacao_id):
                     return redirect("solicitacoes:editar_solicitacao", solicitacao_id=solicitacao.id)
 
                 # Atualiza a solicitação
-                solicitacao.data_prevista = data_prevista_obj
+                solicitacao.data_prevista_desbloqueio = data_prevista_desbloqueio_obj
 
                 # Atualiza também a lista associada
                 if solicitacao.lista:
-                    solicitacao.lista.data_prevista_desbloqueio = data_prevista_obj
+                    solicitacao.lista.data_prevista_desbloqueio_desbloqueio = data_prevista_desbloqueio_obj
                     solicitacao.lista.save()
 
                     # ✅ ATUALIZA TODOS OS ENDEREÇOS DESSA LISTA
                     Endereco.objects.filter(listas=solicitacao.lista).update(
-                        data_desbloqueio=data_prevista_obj
+                        data_desbloqueio=data_prevista_desbloqueio_obj
                     )
 
 
