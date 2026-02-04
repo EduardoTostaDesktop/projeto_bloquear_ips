@@ -119,8 +119,18 @@
 
         <!-- Data prevista -->
         <div id="campo_data_prevista_desbloqueio">
-            <label class="block font-semibold mb-1">Data Prevista</label>
+            <label class="block font-semibold mb-1">Data Prevista Desbloqueio</label>
             <input type="date" name="data_prevista_desbloqueio" class="border rounded px-3 py-2 w-full">
+        </div>
+
+        <!-- Data prevista de renovação -->
+        <div id="campo_data_prevista_renovacao">
+            <label class="block font-semibold mb-1">Data Prevista de Renovação</label>
+            <input
+                type="date"
+                name="data_prevista_renovacao"
+                class="border rounded px-3 py-2 w-full"
+            >
         </div>
 
         <!-- Descrição -->
@@ -196,20 +206,24 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const tipoSelect = document.getElementById("tipo_solicitacao");
-    const campoDataPrevista = document.getElementById("campo_data_prevista_desbloqueio");
 
-    function toggleDataPrevista() {
+    const campoDataDesbloqueio = document.getElementById("campo_data_prevista_desbloqueio");
+    const campoDataRenovacao   = document.getElementById("campo_data_prevista_renovacao");
+
+    function toggleCamposDatas() {
         if (tipoSelect.value === "DESBLOQUEIO") {
-            campoDataPrevista.style.display = "none";
+            campoDataDesbloqueio.style.display = "none";
+            campoDataRenovacao.style.display   = "none";
         } else {
-            campoDataPrevista.style.display = "block";
+            campoDataDesbloqueio.style.display = "block";
+            campoDataRenovacao.style.display   = "block";
         }
     }
 
-    tipoSelect.addEventListener("change", toggleDataPrevista);
+    tipoSelect.addEventListener("change", toggleCamposDatas);
 
-    // 🔥 garante estado correto ao carregar a página
-    toggleDataPrevista();
+    // 🔥 estado inicial
+    toggleCamposDatas();
 });
 </script>
 

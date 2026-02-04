@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 import openpyxl
-from datetime import date, datetime
+from datetime import datetime
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
@@ -10,6 +10,9 @@ from listas.models import Lista
 from solicitantes.models import Solicitante
 from enderecos.models import Endereco
 from django.template.loader import render_to_string
+from .utils import parse_data_post, aplicar_status_endereco
+
+
 
 
 @allowed_roles(['admin', 'engredes'])
@@ -50,26 +53,21 @@ def criar_solicitacao(request):
         lista_existente_id = request.POST.get("lista_existente")
         nome_lista = request.POST.get("nome_lista")
         enderecos_ids = request.POST.getlist("enderecos")
-        data_prevista_desbloqueio = request.POST.get("data_prevista_desbloqueio")
+        data_prevista_desbloqueio = parse_data_post(
+            request,
+            "data_prevista_desbloqueio",
+            "Data prevista de desbloqueio"
+        )
+
+        data_prevista_renovacao = parse_data_post(
+            request,
+            "data_prevista_renovacao",
+            "Data prevista de renovação"
+        )
+
         desc = request.POST.get("desc")
         obs = request.POST.get("obs")
         arquivo = request.FILES.get("arquivo")
-
-        data_prevista_desbloqueio_obj = None
-        data_prevista_desbloqueio = data_prevista_desbloqueio.strip() if data_prevista_desbloqueio else ""
-
-        if data_prevista_desbloqueio:  # Só tenta validar se o usuário realmente preencheu algo
-            try:
-                data_prevista_desbloqueio_obj = datetime.strptime(data_prevista_desbloqueio, "%Y-%m-%d").date()
-            except ValueError:
-                messages.error(request, "Data inválida!")
-                return redirect("solicitacoes:criar_solicitacao")
-
-            # Se o usuário informou a data, valida se não é anterior ao dia atual
-            hoje = date.today()
-            if data_prevista_desbloqueio_obj < hoje:
-                messages.error(request, "A data prevista não pode ser anterior à data atual!")
-                return redirect("solicitacoes:criar_solicitacao")
 
         # --- Seleciona ou cria solicitante ---
         if novo_solicitante_nome and novo_solicitante_nome.strip() != "":
@@ -97,7 +95,8 @@ def criar_solicitacao(request):
                 nome=nome_lista,
                 solicitante=solicitante,
                 criador=request.user,
-                data_prevista_desbloqueio_desbloqueio=data_prevista_desbloqueio_obj
+                data_prevista_desbloqueio=data_prevista_desbloqueio
+
             )
 
         # --- Monta os endereços que farão parte da solicitação ---
@@ -134,47 +133,50 @@ def criar_solicitacao(request):
         nome_solicitacao = f"{solicitante.nome} - {lista.nome} - {data_str}"
 
         solicitacao = Solicitacao.objects.create(
+            nome=nome_solicitacao,
             lista=lista,
             tipo=tipo,
             solicitante=solicitante,
-            data_prevista_desbloqueio=data_prevista_desbloqueio_obj,
+            data_prevista_desbloqueio=data_prevista_desbloqueio,
+            data_prevista_renovacao=data_prevista_renovacao,
             desc=desc,
             obs=obs,
             criado_por=request.user,
-            nome=nome_solicitacao
         )
+
         
         # 🔹 Atualiza também a lista com a nova data, se houver
-        if data_prevista_desbloqueio_obj:
-            lista.data_prevista_desbloqueio_desbloqueio = data_prevista_desbloqueio_obj
+        if data_prevista_desbloqueio:
+            lista.data_prevista_desbloqueio = data_prevista_desbloqueio
             lista.save()
 
         # --- Atualiza status dos endereços ---
         novo_status = "bloqueado" if tipo == "BLOQUEIO" else "desbloqueado"
 
         alterados = 0
+
         for endereco in enderecos_solicitacao:
-            if endereco.status != novo_status:
-                endereco.status = novo_status
-                endereco.data_ultima_solicitacao = datetime.now()
-                endereco.data_desbloqueio = (
-                    data_prevista_desbloqueio_obj if novo_status == "bloqueado" else None
-                )
-                endereco.save()
-                alterados += 1
+            aplicar_status_endereco(
+                endereco=endereco,
+                tipo=tipo,
+                data_desbloqueio=data_prevista_desbloqueio,
+                data_renovacao=data_prevista_renovacao
+            )
+            alterados += 1
+
 
         if alterados:
             messages.success(
                 request,
                 f"{alterados} endereço(s) "
-                f"{'bloqueado(s)' if novo_status == 'BLOQUEADO' else 'desbloqueado(s)'} "
+                f"{'bloqueado(s)' if novo_status == 'bloqueado' else 'desbloqueado(s)'}"
                 "com sucesso!"
             )
         else:
             messages.warning(
                 request,
                 "Todos os endereços selecionados já estavam "
-                f"{'bloqueados' if novo_status == 'BLOQUEADO' else 'desbloqueados'}."
+                f"{'bloqueados' if novo_status == 'bloqueado' else 'desbloqueados'}."
             )
 
         return redirect("solicitacoes:listar_solicitacoes")
@@ -201,13 +203,13 @@ def editar_solicitacao(request, solicitacao_id):
         if data_prevista_desbloqueio:
             try:
                 # Converte a data para objeto datetime com timezone
-                data_prevista_desbloqueio_obj = timezone.make_aware(
+                data_prevista_desbloqueio = timezone.make_aware(
                     datetime.strptime(data_prevista_desbloqueio, "%Y-%m-%d")
                 )
 
 
                 # --- VALIDAÇÃO ---
-                if data_prevista_desbloqueio_obj < solicitacao.data_criacao:
+                if data_prevista_desbloqueio < solicitacao.data_criacao:
                     messages.error(
                         request,
                         "A data prevista não pode ser anterior à data de criação da solicitação!"
@@ -215,17 +217,23 @@ def editar_solicitacao(request, solicitacao_id):
                     return redirect("solicitacoes:editar_solicitacao", solicitacao_id=solicitacao.id)
 
                 # Atualiza a solicitação
-                solicitacao.data_prevista_desbloqueio = data_prevista_desbloqueio_obj
+                solicitacao.data_prevista_desbloqueio = data_prevista_desbloqueio
 
                 # Atualiza também a lista associada
                 if solicitacao.lista:
-                    solicitacao.lista.data_prevista_desbloqueio_desbloqueio = data_prevista_desbloqueio_obj
+                    solicitacao.lista.data_prevista_desbloqueio = data_prevista_desbloqueio
                     solicitacao.lista.save()
 
+
                     # ✅ ATUALIZA TODOS OS ENDEREÇOS DESSA LISTA
-                    Endereco.objects.filter(listas=solicitacao.lista).update(
-                        data_desbloqueio=data_prevista_desbloqueio_obj
-                    )
+                    for endereco in solicitacao.lista.enderecos.all():
+                        aplicar_status_endereco(
+                            endereco=endereco,
+                            tipo=solicitacao.tipo,
+                            data_desbloqueio=data_prevista_desbloqueio,
+                            data_renovacao=solicitacao.data_prevista_renovacao
+                        )
+
 
 
             except ValueError:

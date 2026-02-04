@@ -31,6 +31,7 @@ class Endereco(models.Model):
     obs = models.TextField(blank=True, null=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_desbloqueio = models.DateField(blank=True, null=True)
+    data_renovacao = models.DateField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         # Detectar tipo automaticamente

@@ -95,6 +95,7 @@
                     <th class="py-3 px-3 sm:px-6 text-left">Tipo</th>
                     <th class="py-3 px-3 sm:px-6 text-left hidden sm:table-cell">Nome</th>
                     <th class="py-3 px-3 text-center hidden md:table-cell">Última solicitação</th>
+                    <th class="py-3 px-3 text-center hidden lg:table-cell">Renovação</th>
                     <th class="py-3 px-3 sm:px-6 text-left hidden md:table-cell">Descrição</th>
                     <th class="py-3 px-3 sm:px-6 text-left hidden lg:table-cell">Observação</th>
                     <th class="py-3 px-3 sm:px-6 text-center">Status</th>
@@ -127,6 +128,13 @@
                     <td class="py-2 px-3 text-center hidden md:table-cell">
                         {% if endereco.data_ultima_solicitacao %}
                             {{ endereco.data_ultima_solicitacao|date:"d/m/Y H:i" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td class="py-2 px-3 text-center hidden lg:table-cell">
+                        {% if endereco.data_renovacao %}
+                            {{ endereco.data_renovacao|date:"d/m/Y" }}
                         {% else %}
                             —
                         {% endif %}

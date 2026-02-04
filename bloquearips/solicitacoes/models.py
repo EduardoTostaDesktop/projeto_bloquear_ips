@@ -14,6 +14,7 @@ class Solicitacao(models.Model):
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='BLOQUEIO')
     nome = models.CharField(max_length=255, blank=True)  # Novo campo nome
     data_prevista_desbloqueio = models.DateTimeField(null=True, blank=True)
+    data_prevista_renovacao = models.DateTimeField(null=True, blank=True)
     desc = models.TextField(blank=True, null=True)
     obs = models.TextField(blank=True, null=True)
     solicitante = models.ForeignKey(Solicitante, on_delete=models.PROTECT)

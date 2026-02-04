@@ -9,6 +9,9 @@ from enderecos.forms import EnderecoForm
 from enderecos.models import Endereco
 from django.db.models import Prefetch
 from solicitacoes.models import Solicitacao
+from django.utils import timezone
+from solicitacoes.utils import aplicar_status_endereco
+
 
 @login_required
 def perfil_endereco(request, endereco_id):
@@ -100,18 +103,37 @@ def massa_enderecos(request):
         ids = request.POST.getlist('ids')
         acao = request.POST.get('acao')
 
-        if ids:
-            if acao == 'bloquear':
-                Endereco.objects.filter(id__in=ids).update(status="bloqueado")
-            elif acao == 'desbloquear':
-                Endereco.objects.filter(id__in=ids).update(status="desbloqueado")
-            elif acao == 'excluir':
-                Endereco.objects.filter(id__in=ids).update(status="excluido")
-            messages.success(request, f'Ação "{acao}" realizada com sucesso!')
-        else:
+        if not ids:
             messages.warning(request, "Nenhum endereço selecionado para ação.")
+            return redirect('listar_enderecos')
+
+        enderecos = Endereco.objects.filter(id__in=ids)
+
+        for endereco in enderecos:
+            if acao == 'bloquear':
+                aplicar_status_endereco(
+                    endereco=endereco,
+                    tipo="BLOQUEIO",
+                    data_desbloqueio=endereco.data_desbloqueio,
+                    data_renovacao=endereco.data_renovacao
+                )
+
+            elif acao == 'desbloquear':
+                aplicar_status_endereco(
+                    endereco=endereco,
+                    tipo="DESBLOQUEIO",
+                    data_desbloqueio=None,
+                    data_renovacao=None
+                )
+
+            elif acao == 'excluir':
+                endereco.status = "excluido"
+                endereco.save()
+
+        messages.success(request, f'Ação "{acao}" realizada com sucesso!')
 
     return redirect('listar_enderecos')
+
 
 
 @allowed_roles(['admin', 'engredes'])
