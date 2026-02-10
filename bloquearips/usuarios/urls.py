@@ -10,7 +10,11 @@ urlpatterns = [
     path('editar/<int:usuario_id>/', views.editar_usuario, name='editar_usuario'),
     path('excluir/<int:usuario_id>/', views.excluir_usuario, name='excluir_usuario'),
     path("excluir-massa/", views.excluir_usuarios_massa, name="excluir_usuarios_massa"),  # <- NOVA ROTA
+    # Perfil do próprio usuário
     path("perfil/", views.perfil, name="perfil"),
+
+    # Perfil de outro usuário (somente admins)
+    path("perfil/<int:usuario_id>/", views.perfil, name="perfil_usuario"),
     path("perfil/alterar-senha/", views.alterar_senha, name="alterar_senha"),
 
 ]

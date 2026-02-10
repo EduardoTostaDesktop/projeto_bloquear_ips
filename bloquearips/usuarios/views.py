@@ -9,6 +9,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
 
 # Apenas administradores podem cadastrar usuários
 @login_required
@@ -101,3 +102,18 @@ def alterar_senha(request):
     return render(request, "usuarios/alterar_senha.html", {
         "form": form
     })
+
+
+@login_required
+def perfil(request, usuario_id=None):
+    """
+    Mostra o perfil de um usuário.
+    - Se for admin e passar usuario_id, mostra outro usuário.
+    - Caso contrário, mostra o próprio usuário.
+    """
+    if usuario_id and request.user.is_superuser:
+        usuario = get_object_or_404(Usuario, id=usuario_id)
+    else:
+        usuario = request.user
+
+    return render(request, 'usuarios/perfil.html', {'usuario': usuario})

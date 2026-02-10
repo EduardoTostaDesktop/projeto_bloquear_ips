@@ -71,11 +71,16 @@
                         </td>
                         <td class="py-3 px-6">
                             {% if request.user.is_superuser or request.user == usuario %}
-                                <a href="{% url 'perfil' %}" class="text-blue-600 hover:text-blue-800 underline">
-                                    {{ usuario.username }}
+                                <a href="{% if request.user.is_superuser and request.user != usuario %}
+                                            {% url 'perfil_usuario' usuario.id %}
+                                        {% else %}
+                                            {% url 'perfil' %}
+                                        {% endif %}"
+                                class="text-blue-600 hover:text-blue-800 underline">
+                                    {{ usuario.nome|default:usuario.username }}
                                 </a>
                             {% else %}
-                                {{ usuario.username }}
+                                {{ usuario.nome|default:usuario.username }}
                             {% endif %}
                         </td>
                         <td class="py-3 px-6">{{ usuario.email }}</td>
