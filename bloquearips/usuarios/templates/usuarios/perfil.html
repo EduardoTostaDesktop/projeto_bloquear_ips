@@ -9,57 +9,32 @@
         Meu Perfil
     </h1>
 
-    <div class="space-y-4 text-gray-700">
-        <p><strong>Usuário:</strong> {{ usuario.username }}</p>
-
-        <p><strong>Nome:</strong>
-            {% if usuario.nome%}
-                {{ usuario.nome }}
-            {% else %}
-                —
-            {% endif %}
-        </p>
-
-        <p><strong>Email:</strong>
-            {% if usuario.email %}
-                {{ usuario.email }}
-            {% else %}
-                —
-            {% endif %}
-        </p>
-
-        <p><strong>Tipo:</strong>
-            {% if usuario.tipo == "noc" %}
-                NOC
-            {% elif usuario.tipo == "engredes" %}
-                Engenharia de Redes
-            {% elif usuario.tipo == "admin" %}
-                Administrador
-            {% endif %}
-        </p>
-
-        <p><strong>Status:</strong>
-            {% if usuario.is_active %}
-                Ativo
-            {% else %}
-                Inativo
-            {% endif %}
-        </p>
-
-        <p><strong>Administrador:</strong>
-            {% if usuario.is_staff %}
-                Sim
-            {% else %}
-                Não
-            {% endif %}
-        </p>
+    <!-- Abas -->
+    <div class="flex justify-center mb-6 border-b">
+        <a href="{% url 'perfil' %}"
+        class="px-4 py-2 font-semibold text-gray-500 hover:text-blue-800 border-b-2 border-transparent hover:border-blue-800 transition-colors duration-200">
+            Dados
+        </a>
+        <a href="{% url 'alterar_senha' %}"
+        class="px-4 py-2 font-semibold text-gray-500 hover:text-blue-800 border-b-2 border-transparent hover:border-blue-800 transition-colors duration-200">
+            Alterar Senha
+        </a>
     </div>
 
-    <div class="mt-8 text-center">
-        <a href="{% url 'home' %}"
-           class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-            Voltar ao menu
-        </a>
+
+    <div class="space-y-4 text-gray-700">
+        <p><strong>Usuário:</strong> {{ usuario.username }}</p>
+        <p><strong>Nome:</strong> {{ usuario.nome|default:"—" }}</p>
+        <p><strong>Email:</strong> {{ usuario.email|default:"—" }}</p>
+
+        <p><strong>Tipo:</strong>
+            {% if usuario.tipo == "noc" %}NOC
+            {% elif usuario.tipo == "engredes" %}Engenharia de Redes
+            {% else %}Administrador{% endif %}
+        </p>
+
+        <p><strong>Status:</strong> {{ usuario.is_active|yesno:"Ativo,Inativo" }}</p>
+        <p><strong>Administrador:</strong> {{ usuario.is_staff|yesno:"Sim,Não" }}</p>
     </div>
 
 </div>

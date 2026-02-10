@@ -4,6 +4,11 @@ from .models import Usuario
 from .forms import UsuarioCreateForm
 from .decorators import admin_required
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.shortcuts import render, redirect
 
 # Apenas administradores podem cadastrar usuários
 @login_required
@@ -79,3 +84,20 @@ def excluir_usuarios_massa(request):
         messages.info(request, "Nenhum usuário válido para exclusão.")
 
     return redirect("lista_usuarios")
+
+@login_required
+def alterar_senha(request):
+    if request.method == "POST":
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Mantém o usuário logado
+            update_session_auth_hash(request, user)
+            messages.success(request, "Senha alterada com sucesso!")
+            return redirect("perfil")
+    else:
+        form = PasswordChangeForm(user=request.user)
+
+    return render(request, "usuarios/alterar_senha.html", {
+        "form": form
+    })
