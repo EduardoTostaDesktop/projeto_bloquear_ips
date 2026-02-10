@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 import openpyxl
@@ -89,24 +90,71 @@ def criar_lista(request):
     solicitantes = Solicitante.objects.all()
     return render(request, 'listas/criar_lista.html', {'solicitantes': solicitantes})
 
+from datetime import datetime, date
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib import messages
+from usuarios.decorators import allowed_roles
+from .models import Lista
+from solicitantes.models import Solicitante
+
+
 @allowed_roles(['admin', 'engredes'])
 def editar_lista(request, lista_id):
     lista = get_object_or_404(Lista, id=lista_id)
 
     if request.method == 'POST':
         lista.nome = request.POST.get('nome')
-        lista.solicitante = request.POST.get('solicitante')
         lista.desc = request.POST.get('desc')
         lista.obs = request.POST.get('obs')
-        lista.data_prevista_desbloqueio = request.POST.get('data_prevista_desbloqueio') or None
-        lista.save()
 
+        # 🔹 Solicitan​te (FK)
+        solicitante_id = request.POST.get('solicitante')
+        if solicitante_id:
+            lista.solicitante = get_object_or_404(Solicitante, id=solicitante_id)
+        else:
+            messages.error(request, "Solicitante é obrigatório.")
+            return redirect('listas:editar_lista', lista_id=lista.id)
+
+        # 🔹 Data prevista de desbloqueio
+        data_prevista = request.POST.get('data_prevista_desbloqueio')
+
+        if data_prevista:
+            try:
+                data_convertida = datetime.strptime(
+                    data_prevista, "%Y-%m-%d"
+                ).date()
+
+                if data_convertida < date.today():
+                    messages.error(
+                        request,
+                        "A data prevista de desbloqueio não pode ser anterior à data atual."
+                    )
+                    return redirect('listas:editar_lista', lista_id=lista.id)
+
+                lista.data_prevista_desbloqueio = data_convertida
+
+            except ValueError:
+                messages.error(request, "Formato de data inválido. Use YYYY-MM-DD.")
+                return redirect('listas:editar_lista', lista_id=lista.id)
+        else:
+            lista.data_prevista_desbloqueio = None
+
+        lista.save()
         messages.success(request, "Lista atualizada com sucesso!")
         return redirect('listas:detalhar_lista', lista_id=lista.id)
 
     # GET
     solicitantes = Solicitante.objects.all()
-    return render(request, 'listas/editar_lista.html', {'lista': lista, 'solicitantes': solicitantes})
+    return render(
+        request,
+        'listas/editar_lista.html',
+        {
+            'lista': lista,
+            'solicitantes': solicitantes
+        }
+    )
+
+
 
 @allowed_roles(['admin', 'engredes'])
 def excluir_lista(request, lista_id):
