@@ -1,6 +1,8 @@
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from django.contrib import messages
-from django.utils import timezone
+
+class DataInvalidaError(Exception):
+    pass
 
 
 def parse_data_post(
@@ -9,9 +11,6 @@ def parse_data_post(
     nome_campo_exibicao,
     permitir_passado=False
 ):
-    """
-    Lê uma data do POST, valida e retorna datetime.date ou None.
-    """
     data_str = request.POST.get(campo_post, "")
     data_str = data_str.strip() if data_str else ""
 
@@ -22,16 +21,17 @@ def parse_data_post(
         data_obj = datetime.strptime(data_str, "%Y-%m-%d").date()
     except ValueError:
         messages.error(request, f"{nome_campo_exibicao} inválida.")
-        return None
+        raise DataInvalidaError()
 
     if not permitir_passado and data_obj < date.today():
         messages.error(
             request,
             f"{nome_campo_exibicao} não pode ser anterior à data atual."
         )
-        return None
+        raise DataInvalidaError()
 
     return data_obj
+
 
 def aplicar_status_endereco(endereco, tipo, data_desbloqueio, data_renovacao):
     endereco.status = "bloqueado" if tipo == "BLOQUEIO" else "desbloqueado"

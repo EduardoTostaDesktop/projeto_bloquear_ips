@@ -10,7 +10,7 @@ from listas.models import Lista
 from solicitantes.models import Solicitante
 from enderecos.models import Endereco
 from django.template.loader import render_to_string
-from .utils import parse_data_post, aplicar_status_endereco
+from .utils import DataInvalidaError, parse_data_post, aplicar_status_endereco
 
 
 
@@ -53,17 +53,21 @@ def criar_solicitacao(request):
         lista_existente_id = request.POST.get("lista_existente")
         nome_lista = request.POST.get("nome_lista")
         enderecos_ids = request.POST.getlist("enderecos")
-        data_prevista_desbloqueio = parse_data_post(
-            request,
-            "data_prevista_desbloqueio",
-            "Data prevista de desbloqueio"
-        )
+        try:
+            data_prevista_desbloqueio = parse_data_post(
+                request,
+                "data_prevista_desbloqueio",
+                "Data prevista de desbloqueio"
+            )
 
-        data_prevista_renovacao = parse_data_post(
-            request,
-            "data_prevista_renovacao",
-            "Data prevista de renovação"
-        )
+            data_prevista_renovacao = parse_data_post(
+                request,
+                "data_prevista_renovacao",
+                "Data prevista de renovação"
+            )
+
+        except DataInvalidaError:
+            return redirect("solicitacoes:criar_solicitacao")
 
         desc = request.POST.get("desc")
         obs = request.POST.get("obs")
