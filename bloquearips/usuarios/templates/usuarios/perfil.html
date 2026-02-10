@@ -13,8 +13,8 @@
         <p><strong>Usuário:</strong> {{ usuario.username }}</p>
 
         <p><strong>Nome:</strong>
-            {% if usuario.first_name %}
-                {{ usuario.first_name }} {{ usuario.last_name }}
+            {% if usuario.nome%}
+                {{ usuario.nome }}
             {% else %}
                 —
             {% endif %}
