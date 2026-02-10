@@ -69,7 +69,15 @@
                         <td class="py-3 px-6">
                             <input type="checkbox" class="selectRow" name="ids" value="{{ usuario.id }}" data-nome="{{ usuario.username }}">
                         </td>
-                        <td class="py-3 px-6">{{ usuario.username }}</td>
+                        <td class="py-3 px-6">
+                            {% if request.user.is_superuser or request.user == usuario %}
+                                <a href="{% url 'perfil' %}" class="text-blue-600 hover:text-blue-800 underline">
+                                    {{ usuario.username }}
+                                </a>
+                            {% else %}
+                                {{ usuario.username }}
+                            {% endif %}
+                        </td>
                         <td class="py-3 px-6">{{ usuario.email }}</td>
                         <td class="py-3 px-6">{{ usuario.get_tipo_display }}</td>
                         <td class="py-3 px-6 text-center flex justify-center space-x-2">
