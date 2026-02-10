@@ -1,4 +1,5 @@
-from datetime import datetime, date, timezone
+from datetime import date, datetime
+from django.utils import timezone
 from django.contrib import messages
 
 class DataInvalidaError(Exception):
@@ -45,3 +46,5 @@ def aplicar_status_endereco(endereco, tipo, data_desbloqueio, data_renovacao):
         endereco.data_renovacao = None
 
     endereco.save()
+
+
