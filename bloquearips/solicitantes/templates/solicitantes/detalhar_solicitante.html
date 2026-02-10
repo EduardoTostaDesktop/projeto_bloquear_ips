@@ -30,9 +30,18 @@
         {% if solicitante.obs %}
             <div>
                 <span class="font-semibold text-gray-600 block mb-1">Observações:</span>
-                <div class="bg-gray-50 border rounded p-3 text-sm">
-                    {{ solicitante.obs }}
-                </div>
+                <p class="border p-2 rounded
+                        w-full
+                        max-w-full
+                        overflow-hidden
+                        whitespace-pre-wrap
+                        bg-gray-50"
+                    style="
+                    overflow-wrap:anywhere;
+                    word-break:break-word;
+                ">
+                    {{ solicitante.obs|default:"-" }}
+                </p>
             </div>
         {% endif %}
 
