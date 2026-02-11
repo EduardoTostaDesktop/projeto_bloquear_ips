@@ -9,9 +9,13 @@ SECRET_KEY = os.environ.get(
     "django-insecure-dev-key"
 )
 
+#Envio de emails
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'no-reply@seudominio.com'
 
-DEBUG = os.environ.get("DEBUG", "False") == "True"
-#DEBUG = True
+
+#DEBUG = os.environ.get("DEBUG", "False") == "True"
+DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", "projeto-bloquear-ips.onrender.com"]
 
@@ -27,6 +31,7 @@ INSTALLED_APPS = [
     'listas',
     'solicitantes',
     'solicitacoes',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [

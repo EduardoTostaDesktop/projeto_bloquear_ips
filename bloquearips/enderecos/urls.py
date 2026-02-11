@@ -8,7 +8,5 @@ urlpatterns = [
     path('excluir/<int:endereco_id>/', views.excluir_endereco, name='excluir_endereco'),
     path('<int:endereco_id>/', views.perfil_endereco, name='perfil_endereco'),
     path('massa/', views.massa_enderecos, name='massa_enderecos'),
-    path("usuarios/", include("usuarios.urls")),
-
     
 ]
