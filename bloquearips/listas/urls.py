@@ -2,7 +2,6 @@ from django.urls import path
 from . import views
 
 app_name = "listas"
-
 urlpatterns = [
     path('', views.listar_listas, name='listar_listas'),                # Lista todas as listas
     path('criar/', views.criar_lista, name='criar_lista'),            # Criar lista + upload CSV
