@@ -31,19 +31,19 @@
                 <!-- Nome e Logout -->
                 <div class="flex flex-col items-end">
                     <span class="text-sm font-medium">{{ user.username }}</span>
-                    <form method="POST" action="{% url 'logout' %}">
+                    <form method="POST" action="{% url 'usuarios:logout' %}">
                         {% csrf_token %}
                         <button type="submit" class="text-sm hover:underline cursor-pointer">Logout</button>
                     </form>
                 </div>
                 
                 <!-- Ícone de perfil -->
-                 <a href="{% url 'perfil' %}" class="hover:underline">
+                 <a href="{% url 'usuarios:perfil' %}" class="hover:underline">
                     <img src="{% static 'images/perfil.png' %}" alt="Perfil" class="h-8 w-8 rounded-full border-2 border-white">
                 </a>
             </div>
             {% else %}
-                <a href="{% url 'login' %}" class="px-3 hover:underline">Login</a>
+                <a href="{% url 'usuarios:login' %}" class="px-3 hover:underline">Login</a>
             {% endif %}
         </div>
     </nav>

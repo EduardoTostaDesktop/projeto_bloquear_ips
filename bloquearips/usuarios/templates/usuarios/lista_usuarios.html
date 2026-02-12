@@ -34,10 +34,10 @@
     </div>
 
     <!-- Formulário de exclusão em massa -->
-    <form id="usuariosForm" method="POST" action="{% url 'excluir_usuarios_massa' %}">
+    <form id="usuariosForm" method="POST" action="{% url 'usuarios:excluir_usuarios_massa' %}">
         {% csrf_token %}
             <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full mb-4 mx-auto flex flex-col sm:flex-row sm:justify-center sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">   
-            <a href="{% url 'cadastrar_usuario' %}" 
+            <a href="{% url 'usuarios:cadastrar_usuario' %}" 
             class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                 Cadastrar
             </a>
@@ -72,9 +72,9 @@
                         <td class="py-3 px-6">
                             {% if request.user.is_superuser or request.user == usuario %}
                                 <a href="{% if request.user.is_superuser and request.user != usuario %}
-                                            {% url 'perfil_usuario' usuario.id %}
+                                            {% url 'usuarios:perfil_usuario' usuario.id %}
                                         {% else %}
-                                            {% url 'perfil' %}
+                                            {% url 'usuarios:perfil' %}
                                         {% endif %}"
                                 class="text-blue-600 hover:text-blue-800 underline">
                                     {{ usuario.nome|default:usuario.username }}
@@ -86,7 +86,7 @@
                         <td class="py-3 px-6">{{ usuario.email }}</td>
                         <td class="py-3 px-6">{{ usuario.get_tipo_display }}</td>
                         <td class="py-3 px-6 text-center flex justify-center space-x-2">
-                            <a href="{% url 'editar_usuario' usuario.id %}" 
+                            <a href="{% url 'usuarios:editar_usuario' usuario.id %}" 
                                class="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded">Editar</a>
                         </td>
                     </tr>

@@ -66,7 +66,7 @@
     </div>
 
 
-<form id="massaForm" method="POST" action="{% url 'massa_enderecos' %}">
+<form id="massaForm" method="POST" action="{% url 'enderecos:massa_enderecos' %}">
     {% csrf_token %}
 
     {% if request.user.tipo != "noc" %} 
@@ -121,7 +121,7 @@
                     </td>
                     {% endif %}
                     <td class="py-2 px-3 sm:px-6 text-blue-600 hover:underline truncate max-w-[120px] sm:max-w-none">
-                        <a href="{% url 'perfil_endereco' endereco.id %}">{{ endereco.endereco|default_if_none:""|truncatechars:15 }}</a>
+                        <a href="{% url 'enderecos:perfil_endereco' endereco.id %}">{{ endereco.endereco|default_if_none:""|truncatechars:15 }}</a>
                     </td>
                     <td class="py-2 px-3 sm:px-6">{{ endereco.tipo|upper }}</td>
                     <td class="py-2 px-3 sm:px-6 hidden sm:table-cell truncate max-w-[100px]" title="{{ endereco.nome }}">{{ endereco.nome|default_if_none:""|truncatechars:15 }}</td>
@@ -158,7 +158,7 @@
 
                     {% if request.user.tipo != "noc" %}
                     <td class="py-2 px-3 sm:px-6 text-center flex justify-center items-center space-x-1 sm:space-x-2">
-                        <a href="{% url 'editar_endereco' endereco.id %}" class="px-2 sm:px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded text-xs sm:text-sm">Editar</a>
+                        <a href="{% url 'enderecos:editar_endereco' endereco.id %}" class="px-2 sm:px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded text-xs sm:text-sm">Editar</a>
                     </td>
                     {% endif %}
                 </tr>
