@@ -145,7 +145,7 @@ def cadastrar_endereco(request):
             endereco_obj.tipo = detectar_tipo(endereco_obj.endereco)
             endereco_obj.save()
             messages.success(request, "Endereço cadastrado com sucesso!")
-            return redirect("listar_enderecos")
+            return redirect("enderecos:listar_enderecos")
     else:
         form = EnderecoForm()
     return render(request, "enderecos/form_endereco.html", {"form": form, "titulo": "Cadastrar Endereço"})
@@ -163,7 +163,7 @@ def editar_endereco(request, endereco_id):
             endereco_obj.save()
 
             messages.success(request, "Endereço atualizado com sucesso!")
-            return redirect("listar_enderecos")
+            return redirect("enderecos:listar_enderecos")
         else:
             print("❌ FORM INVÁLIDO")
             print(form.errors)  # 🔥 ISSO É O MAIS IMPORTANTE
@@ -184,5 +184,5 @@ def excluir_endereco(request, endereco_id):
     endereco.status = "excluido"
     endereco.save()
     messages.success(request, "Endereço excluído com sucesso!")
-    return redirect("listar_enderecos")
+    return redirect("enderecos:listar_enderecos")
 
