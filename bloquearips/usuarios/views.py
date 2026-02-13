@@ -67,7 +67,7 @@ def excluir_usuarios_massa(request):
     ids = request.POST.getlist("ids")  # Pega todos os IDs selecionados
     if not ids:
         messages.warning(request, "Nenhum usuário selecionado para exclusão.")
-        return redirect("lista_usuarios")
+        return redirect("usuarios:lista_usuarios")
 
     # Proteção extra: evita deletar a própria conta
     if str(request.user.id) in ids:
@@ -84,7 +84,7 @@ def excluir_usuarios_massa(request):
     else:
         messages.info(request, "Nenhum usuário válido para exclusão.")
 
-    return redirect("lista_usuarios")
+    return redirect("usuarios:lista_usuarios")
 
 @login_required
 def alterar_senha(request):

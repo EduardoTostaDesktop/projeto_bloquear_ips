@@ -7,81 +7,94 @@
 <div class="container mx-auto py-10 flex flex-col items-center">
 
     <h1 class="text-3xl font-bold mb-6">Listas Cadastradas</h1>
-
-<form id="listasForm" method="POST" action="{% url 'listas:excluir_listas_massa' %}">
-    {% csrf_token %}
-        <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full mb-4 mx-auto flex flex-col sm:flex-row sm:justify-center sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">   
-        <button type="button" onclick="openConfirmModal(
-            document.getElementById('listasForm'),
-            document.querySelectorAll('.selectRow:checked'),
-            'Confirmação de Exclusão',
-            'Tem certeza que deseja excluir as seguintes listas?'
-        )" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-            Excluir Selecionadas
-        </button>
-
-
-
-            <a href="{% url 'listas:criar_lista' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition">
-             Nova Lista
-        </a>
+     <!-- Filtros -->
+    <div class="w-full md:w-1/2 mb-6 flex space-x-2">
+        <div class="flex-1 my-2 p-1 bg-white flex border border-gray-200 rounded">
+            <input 
+                placeholder="Buscar por nome ou solicitante" 
+                class="p-2 appearance-none outline-none w-full text-gray-800"
+                id="searchInput"
+                 onkeyup="filterTable()"
+            >
+            <div class="text-gray-300 w-8 py-1 pl-2 pr-1 border-l flex items-center border-gray-200">
+                <button class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m1.85-5.15A7 7 0 1110 3a7 7 0 018.5 8.5z" />
+                    </svg>
+                </button>
+            </div>
         </div>
-    <div class="min-w-full max-h-[500px] overflow-y-auto border border-gray-200 rounded">
-        <table class="min-w-full table-auto">
-            <thead class="bg-gray-600 text-white sticky top-0 z-20">
-                <tr>
-                    <th class="py-3 px-6">
-                        <input type="checkbox" id="selectAll" onclick="toggleAll(this)">        
-                    </th>
-                    <th class="py-3 px-6 text-left">Nome</th>
-                    <th class="py-3 px-6 text-left">Solicitante</th>
-                    <th class="py-3 px-6 text-left">Criador</th>
-                    <th class="py-3 px-6 text-left">Data Registro</th>
-                    <th class="py-3 px-6 text-left">Data Prevista Desbloqueio</th>
-                    <th class="py-3 px-6 text-left">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for lista in listas %}
-                <tr class="border-b hover:bg-gray-100">
-                    <td class="py-3 px-6">
-                        <input type="checkbox" class="selectRow" name="ids" value="{{ lista.id }}" data-nome="{{ lista.nome }}">
-                    </td>
-                    <td class="py-3 px-6">
-                        <a href="{% url 'listas:detalhar_lista' lista.id %}" class="text-blue-600 hover:underline">
-                            {{ lista.nome }}
-                        </a>
-                    </td>
-                    <td class="py-3 px-6">{{ lista.solicitante }}</td>
-                    <td class="py-3 px-6">{{ lista.criador }}</td>
-                    <td class="py-3 px-6">{{ lista.data_registro|date:"d/m/Y H:i" }}</td>
-                    <td class="py-3 px-6">
-                        {% if lista.data_prevista_desbloqueio %}
-                            {{ lista.data_prevista_desbloqueio|date:"d/m/Y" }}
-                        {% else %}
-                            <span class="text-gray-400 italic">—</span>
-                        {% endif %}
-                    </td>
-                    <td class="py-3 px-6 flex space-x-2">
-                        <a href="{% url 'listas:editar_lista' lista.id %}" class="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded-lg transition">
-                            Editar
-                        </a>
-                        <button type="button" onclick="confirmDelete({{ lista.id }})" class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg">
-                            Excluir
-                        </button>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="7" class="text-center py-6 text-gray-500 italic">
-                        Nenhuma lista cadastrada no momento.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
-</form>
+
+    <form id="listasForm" method="POST" action="{% url 'listas:excluir_listas_massa' %}">
+        {% csrf_token %}
+        <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full mb-4 mx-auto flex flex-col sm:flex-row sm:justify-center sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">   
+            <a href="{% url 'listas:criar_lista' %}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Nova Lista
+            </a>
+            <button type="button" onclick="openConfirmModal(
+                document.getElementById('listasForm'),
+                document.querySelectorAll('.selectRow:checked'),
+                'Confirmação de Exclusão',
+                'Tem certeza que deseja excluir as seguintes listas?'
+            )" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                Excluir Selecionadas
+            </button>
+        </div>
+
+    <div class="min-w-full max-h-[500px] overflow-y-auto border border-gray-200 rounded">
+            <table id="listaTable" class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full">
+                <thead class="bg-gray-600 text-white sticky top-0 z-20">
+                    <tr>
+                        <th class="py-3 px-6">
+                            <input type="checkbox" id="selectAll" onclick="toggleAll(this)">        
+                        </th>
+                        <th class="py-3 px-6 text-left">Nome</th>
+                        <th class="py-3 px-6 text-left">Solicitante</th>
+                        <th class="py-3 px-6 text-left">Criador</th>
+                        <th class="py-3 px-6 text-left">Data Registro</th>
+                        <th class="py-3 px-6 text-left">Data Prevista Desbloqueio</th>
+                        <th class="py-3 px-6 text-left">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lista in listas %}
+                    <tr class="border-b hover:bg-gray-100">
+                        <td class="py-3 px-6">
+                            <input type="checkbox" class="selectRow" name="ids" value="{{ lista.id }}" data-nome="{{ lista.nome }}">
+                        </td>
+                        <td class="py-3 px-6">
+                            <a href="{% url 'listas:detalhar_lista' lista.id %}" class="text-blue-600 hover:underline">
+                                {{ lista.nome }}
+                            </a>
+                        </td>
+                        <td class="py-3 px-6">{{ lista.solicitante }}</td>
+                        <td class="py-3 px-6">{{ lista.criador }}</td>
+                        <td class="py-3 px-6">{{ lista.data_registro|date:"d/m/Y H:i" }}</td>
+                        <td class="py-3 px-6">
+                            {% if lista.data_prevista_desbloqueio %}
+                                {{ lista.data_prevista_desbloqueio|date:"d/m/Y" }}
+                            {% else %}
+                                <span class="text-gray-400 italic">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-6 flex space-x-2">
+                            <a href="{% url 'listas:editar_lista' lista.id %}" class="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded-lg transition">
+                                Editar
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-6 text-gray-500 italic">
+                            Nenhuma lista cadastrada no momento.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
 </div>
 
 <script>
@@ -90,10 +103,26 @@ function toggleAll(master) {
     checkboxes.forEach(cb => cb.checked = master.checked);
 }
 
-function confirmDelete(listaId) {
+function confirmDelete(button, listaId) {
+    const baseUrl = button.dataset.url.replace('/0/', '/');
     if (confirm('Tem certeza que deseja excluir esta lista?')) {
-        window.location.href = `/listas/excluir/${listaId}/`;
+        window.location.href = baseUrl + listaId + '/';
     }
+}
+
+function filterTable() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#listaTable tbody tr');
+
+    rows.forEach(row => {
+        const nome = row.cells[1]?.textContent.toLowerCase() || '';
+        const solicitante = row.cells[2]?.textContent.toLowerCase() || '';
+
+        row.style.display =
+            nome.includes(input) || solicitante.includes(input)
+                ? ''
+                : 'none';
+    });
 }
 </script>
 {% endblock %}

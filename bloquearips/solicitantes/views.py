@@ -59,3 +59,11 @@ def excluir_solicitante(request, solicitante_id):
     solicitante.delete()
     messages.success(request, "Solicitante excluído com sucesso!")
     return redirect("solicitantes:listar_solicitantes")
+
+@allowed_roles(['admin', 'engredes'])
+def excluir_solicitantes_massa(request):
+    if request.method == "POST":
+        ids = request.POST.getlist("ids")
+        Solicitante.objects.filter(id__in=ids).delete()
+        messages.success(request, "Solicitantes excluídos com sucesso.")
+    return redirect("solicitantes:listar_solicitantes")

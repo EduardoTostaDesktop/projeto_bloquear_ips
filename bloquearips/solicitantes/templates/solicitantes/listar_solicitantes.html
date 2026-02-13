@@ -6,79 +6,137 @@
 {% block content %}
 <div class="container mx-auto py-10 flex flex-col items-center">
 
-    <h1 class="text-3xl font-bold text-center mb-6">Solicitantes Cadastrados</h1>
-
+    <h1 class="text-3xl font-bold mb-6">Solicitantes Cadastrados</h1>
     <!-- Filtros -->
-    <div class="w-full md:w-1/2 mb-6 flex space-x-2">
-        <div class="flex-1 my-2 p-1 bg-white flex border border-gray-200 rounded">
-            <input 
-                placeholder="Buscar por nome ou contato" 
-                class="p-2 appearance-none outline-none w-full text-gray-800"
-                id="searchInput"
-            >
-            <div class="text-gray-300 w-8 py-1 pl-2 pr-1 border-l flex items-center border-gray-200">
-                <button class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none" onclick="filterTable()">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m1.85-5.15A7 7 0 1110 3a7 7 0 018.5 8.5z" />
-                    </svg>
-                </button>
+        <div class="w-full md:w-1/2 mb-6 flex space-x-2">
+            <div class="flex-1 my-2 p-1 bg-white flex border border-gray-200 rounded">
+                <input 
+                    placeholder="Buscar por nome ou contato" 
+                    class="p-2 appearance-none outline-none w-full text-gray-800"
+                    id="searchInput"
+                >
+                <div class="text-gray-300 w-8 py-1 pl-2 pr-1 border-l flex items-center border-gray-200">
+                    <button class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none" onclick="filterTable()">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m1.85-5.15A7 7 0 1110 3a7 7 0 018.5 8.5z" />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-
-    <!-- Botão Novo Solicitante alinhado com a tabela -->
-    <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full mb-4">
-        <div class="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
-            <a href="{% url 'solicitantes:cadastrar_solicitante' %}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+    <!-- Ações -->
+    <form method="POST" action="{% url 'solicitantes:excluir_solicitantes_massa' %}" id="solicitantesForm">
+        {% csrf_token %}
+        <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full mb-4 mx-auto flex flex-col sm:flex-row sm:justify-center sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">   
+            <a href="{% url 'solicitantes:cadastrar_solicitante' %}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition">
                 Novo Solicitante
             </a>
+            <button type="button"
+                    onclick="openConfirmModal(
+                        document.getElementById('solicitantesForm'),
+                        document.querySelectorAll('.rowCheckbox:checked'),
+                        'Confirmação de Exclusão',
+                        'Tem certeza que deseja excluir os solicitantes selecionados?'
+                    )"
+                   class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow transition">
+                Excluir selecionados
+            </button>
         </div>
-    </div>
+ 
 
     <!-- Tabela de solicitantes -->
-    <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full overflow-x-auto">
-        <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full">
-            <thead class="bg-gray-600 text-white text-sm sm:text-base">
-                <tr>
-                    <th class="py-3 px-6 text-left">Nome</th>
-                    <th class="py-3 px-6 text-left">Contato</th>
-                    <th class="py-3 px-6 text-center">Ações</th>
-                </tr>
-            </thead>
-            <tbody id="solicitanteTable" class="text-sm sm:text-base">
-                {% for s in solicitantes %}
-                <tr class="border-b hover:bg-gray-100">
-                    <td class="py-3 px-6 text-blue-600 hover:underline">
-                        <a href="{% url 'solicitantes:detalhar_solicitante' s.id %}">{{ s.nome }}</a>
-                    </td>
-                    <td class="py-3 px-6">{{ s.contato }}</td>
-                    <td class="py-3 px-6 text-center flex justify-center space-x-2">
-                        <a href="{% url 'solicitantes:editar_solicitante' s.id %}" class="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded">Editar</a>
-                        <a href="{% url 'solicitantes:excluir_solicitante' s.id %}" 
-                        onclick="return confirm('Tem certeza que deseja excluir este solicitante?');"
-                        class="px-2 sm:px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs sm:text-sm">
-                        Excluir
-                        </a>                    
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
+    <div class="min-w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full max-h-[500px] overflow-y-auto border border-gray-200 rounded">
+    <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full">
+        <thead class="bg-gray-600 text-white text-sm sm:text-base">
+            <tr>
+                <!-- Checkbox geral -->
+                <th class="py-3 px-4 text-center">
+                    <input type="checkbox" onclick="toggleAll(this)">
+                </th>
+                <th class="py-3 px-6 text-left">Nome</th>
+                <th class="py-3 px-6 text-left">Contato</th>
+                <th class="py-3 px-6 text-center">Ações</th>
+            </tr>
+        </thead>
+
+        <tbody id="solicitanteTable" class="text-sm sm:text-base">
+            {% for s in solicitantes %}
+            <tr class="border-b hover:bg-gray-100">
+                <!-- Checkbox -->
+                <td class="py-3 px-4 text-center">
+                    <input type="checkbox"
+                        class="rowCheckbox"
+                        name="ids"
+                        value="{{ s.id }}"
+                        data-nome="{{ s.nome }}">
+                </td>
+
+                <!-- Nome -->
+                <td class="py-3 px-6 text-blue-600 hover:underline">
+                    <a href="{% url 'solicitantes:detalhar_solicitante' s.id %}">
+                        {{ s.nome }}
+                    </a>
+                </td>
+
+                <!-- Contato -->
+                <td class="py-3 px-6">{{ s.contato }}</td>
+
+                <!-- Ações -->
+                <td class="py-3 px-6 text-center flex justify-center space-x-2">
+                    <a href="{% url 'solicitantes:editar_solicitante' s.id %}"
+                       class="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded">
+                        Editar
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center py-6 text-gray-500 italic">
+                    Nenhum solicitante cadastrado.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
         </table>
-    </div>
+    </form> 
 </div>
+
 
 <!-- Script para filtrar tabela -->
 <script>
+function toggleAll(master) {
+    document.querySelectorAll('.rowCheckbox')
+        .forEach(cb => cb.checked = master.checked);
+}
+
+function confirmBulkDelete() {
+    const selected = document.querySelectorAll('.rowCheckbox:checked');
+
+    if (selected.length === 0) {
+        alert('Selecione pelo menos um solicitante.');
+        return;
+    }
+
+    if (confirm(`Deseja excluir ${selected.length} solicitante(s)?`)) {
+        document.getElementById('solicitantesForm').submit();
+    }
+}
+
 function filterTable() {
     const input = document.getElementById('searchInput').value.toLowerCase();
     const rows = document.querySelectorAll('#solicitanteTable tr');
 
     rows.forEach(row => {
-        const nome = row.cells[0]?.textContent.toLowerCase() || '';
-        const contato = row.cells[1]?.textContent.toLowerCase() || '';
+        const nome = row.cells[1]?.textContent.toLowerCase() || '';
+        const contato = row.cells[2]?.textContent.toLowerCase() || '';
 
-        row.style.display = (nome.includes(input) || contato.includes(input)) ? '' : 'none';
+        row.style.display =
+            nome.includes(input) || contato.includes(input)
+                ? ''
+                : 'none';
     });
 }
 </script>
+
 {% endblock %}
