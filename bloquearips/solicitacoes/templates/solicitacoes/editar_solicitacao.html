@@ -3,10 +3,15 @@
 
 {% block content %}
 <div class="container mx-auto p-6 bg-white rounded shadow-md mt-6">
-    <h2 class="text-2xl font-bold mb-4">{{solicitacao.nome}}</h2>
+    <h2 class="text-2xl font-bold mb-4">Editar Solicitação</h2>
 
     <form method="POST">
         {% csrf_token %}
+        <!--Nome-->
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Nome</label>
+            <input type="text" name="nome" value="{{ solicitacao.nome }}" required class="w-full p-2 border rounded">
+        </div>
 
         <!-- Descrição -->
         <div class="mb-4">
@@ -31,10 +36,13 @@
         </div>
 
         <!-- Botões -->
-        <div class="flex justify-between items-center">
-            <a href="{% url 'solicitacoes:detalhar_solicitacao' solicitacao.id %}"
-               class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancelar</a>
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Salvar</button>
+        <div class="flex justify-end space-x-3 pt-4">
+            <a href="{% url 'solicitacoes:detalhar_solicitacao' solicitacao.id %}" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                Cancelar
+            </a>
+            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                Salvar
+            </button>
         </div>
     </form>
 </div>
