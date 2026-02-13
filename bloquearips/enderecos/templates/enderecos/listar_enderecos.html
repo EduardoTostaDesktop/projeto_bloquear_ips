@@ -143,15 +143,14 @@
                     <td class="py-2 px-3 sm:px-6 hidden lg:table-cell truncate max-w-[150px]" title="{{ endereco.obs }}">{{ endereco.obs|default_if_none:""|truncatechars:20 }}</td>
                     <td class="py-2 px-3 sm:px-6 text-center" data-status="{{ endereco.status|lower }}">
                         {% if endereco.status == "bloqueado" %}
-                            <span class="text-red-600 font-semibold">(Bloqueado)</span>
+                            <span class="text-red-600 font-semibold">Bloqueado</span>
 
                         {% elif endereco.status == "desbloqueado" %}
-                            <span class="text-green-600 font-semibold">(Desbloqueado)</span>
-
+                            <span class="text-green-600 font-semibold">Desbloqueado</span>
                         {% elif endereco.status == "excluido" %}
-                            <span class="text-gray-500 font-semibold">(Excluído)</span>
+                            <span class="text-gray-500 font-semibold">Excluído</span>
                         {% else %}
-                            <span class="text-gray-400 italic">(Status desconhecido)</span>
+                            <span class="text-gray-400 italic">Status desconhecido</span>
                         {% endif %}
                     </td>
 

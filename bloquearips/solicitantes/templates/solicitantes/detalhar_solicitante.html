@@ -74,10 +74,18 @@
                                     </a>
                                 </td>
                                 <td class="py-2 px-4">
-                                    {{ solicitacao.tipo }}
+                                   {% if solicitacao.tipo == "BLOQUEIO" %}
+                                        <span class="text-red-600 font-semibold">Bloqueio</span>
+
+                                    {% elif solicitacao.tipo == "DESBLOQUEIO" %}
+                                        <span class="text-green-600 font-semibold">Desbloqueio</span>
+                                    {% endif %}
                                 </td>
                                 <td class="py-2 px-4">
-                                    {{ solicitacao.lista.nome }}
+                                    <a href="{% url 'listas:detalhar_lista' solicitacao.lista.id %}" 
+                                        class="text-blue-600 hover:underline">
+                                            {{ solicitacao.lista.nome }}
+                                    </a>
                                 </td>
                                 <td class="py-2 px-4 text-center">
                                     {% if solicitacao.data_prevista_desbloqueio %}
