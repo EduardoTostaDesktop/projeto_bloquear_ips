@@ -4,68 +4,95 @@
 {% block title %}Cadastrar Usuário{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md px-8 py-10 flex flex-col items-center">
-    <h1 class="text-2xl font-bold text-center mb-6">Cadastrar Usuário</h1>
+<div class="container mx-auto py-10 flex flex-col items-center">
 
-    <!-- Mensagens de sucesso -->
-    {% if messages %}
-        <ul class="mb-4 w-full">
-            {% for message in messages %}
-                <li class="text-green-600 bg-green-100 p-2 rounded mb-1">{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+    <h1 class="text-3xl font-bold mb-6">Cadastrar Usuário</h1>
 
-    <!-- Erros do formulário -->
-    {% if form.errors %}
-        <ul class="mb-4 w-full">
-            {% for field in form %}
-                {% for error in field.errors %}
-                    <li class="text-red-600 bg-red-100 p-2 rounded mb-1">{{ error }}</li>
-                {% endfor %}
-            {% endfor %}
-            {% for error in form.non_field_errors %}
-                <li class="text-red-600 bg-red-100 p-2 rounded mb-1">{{ error }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-
-    <form method="POST" class="space-y-4 w-full">
+    <form method="POST" class="w-full md:w-1/2 bg-white p-6 rounded shadow">
         {% csrf_token %}
 
-        <div class="flex flex-col">
-            {{ form.username.label_tag }}
+        <!-- Mensagens de sucesso -->
+        {% if messages %}
+            <ul class="mb-4">
+                {% for message in messages %}
+                    <li class="text-green-600 bg-green-100 p-2 rounded mb-1">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <!-- Erros do formulário -->
+        {% if form.errors %}
+            <ul class="mb-4">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li class="text-red-600 bg-red-100 p-2 rounded mb-1">
+                            {{ error }}
+                        </li>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li class="text-red-600 bg-red-100 p-2 rounded mb-1">
+                        {{ error }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">
+                {{ form.username.label }}
+            </label>
             {{ form.username|add_class:"w-full px-3 py-2 border rounded" }}
         </div>
 
-        <div class="flex flex-col">
-            {{ form.email.label_tag }}
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">
+                {{ form.email.label }}
+            </label>
             {{ form.email|add_class:"w-full px-3 py-2 border rounded" }}
         </div>
-        
-        <div class="flex flex-col">
-            {{ form.nome.label_tag }}
+
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">
+                {{ form.nome.label }}
+            </label>
             {{ form.nome|add_class:"w-full px-3 py-2 border rounded" }}
         </div>
 
-        <div class="flex flex-col">
-            {{ form.tipo.label_tag }}
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">
+                {{ form.tipo.label }}
+            </label>
             {{ form.tipo|add_class:"w-full px-3 py-2 border rounded" }}
         </div>
 
-        <div class="flex flex-col">
-            {{ form.password1.label_tag }}
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">
+                {{ form.password1.label }}
+            </label>
             {{ form.password1|add_class:"w-full px-3 py-2 border rounded" }}
         </div>
 
-        <div class="flex flex-col">
-            {{ form.password2.label_tag }}
+        <div class="mb-6">
+            <label class="block font-semibold mb-1">
+                {{ form.password2.label }}
+            </label>
             {{ form.password2|add_class:"w-full px-3 py-2 border rounded" }}
         </div>
 
-        <button type="submit" class="w-full bg-green-600 text-white px-2 py-2 rounded hover:bg-green-700 transition">
-            Cadastrar
-        </button>
+        <div class="flex justify-end space-x-2">
+            <a href="{% url 'usuarios:lista_usuarios' %}"
+               class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                Cancelar
+            </a>
+            <button type="submit"
+                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Cadastrar Usuário
+            </button>
+        </div>
     </form>
+
 </div>
 {% endblock %}
