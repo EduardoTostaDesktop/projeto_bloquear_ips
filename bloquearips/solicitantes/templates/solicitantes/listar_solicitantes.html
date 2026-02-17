@@ -27,9 +27,9 @@
     <!-- Ações -->
     <form method="POST" action="{% url 'solicitantes:excluir_solicitantes_massa' %}" id="solicitantesForm">
         {% csrf_token %}
-        <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full mb-4 mx-auto flex flex-col sm:flex-row sm:justify-center sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">   
+        <div class="w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full mb-4 mx-auto flex flex-col sm:flex-row sm:justify-center sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">
             <a href="{% url 'solicitantes:cadastrar_solicitante' %}" 
-               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition">
+               class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 whitespace-nowrap">
                 Novo Solicitante
             </a>
             <button type="button"
@@ -39,66 +39,67 @@
                         'Confirmação de Exclusão',
                         'Tem certeza que deseja excluir os solicitantes selecionados?'
                     )"
-                   class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow transition">
+                   class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 whitespace-nowrap">
                 Excluir selecionados
             </button>
         </div>
  
 
-    <!-- Tabela de solicitantes -->
-    <div class="min-w-full md:w-3/4 lg:w-4/5 xl:w-11/12 2xl:w-full max-h-[500px] overflow-y-auto border border-gray-200 rounded">
-    <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full">
-        <thead class="bg-gray-600 text-white text-sm sm:text-base">
-            <tr>
-                <!-- Checkbox geral -->
-                <th class="py-3 px-4 text-center">
-                    <input type="checkbox" onclick="toggleAll(this)">
-                </th>
-                <th class="py-3 px-6 text-left">Nome</th>
-                <th class="py-3 px-6 text-left">Contato</th>
-                <th class="py-3 px-6 text-center">Ações</th>
-            </tr>
-        </thead>
+        <!-- Tabela de solicitantes -->
+    <div class="min-w-full max-h-[500px] overflow-y-auto border border-gray-200 rounded">
+            <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full">
+                <thead class="bg-gray-600 text-white sticky top-0 z-20">
+                    <tr>
+                        <!-- Checkbox geral -->
+                        <th class="py-3 px-6" >
+                            <input type="checkbox" onclick="toggleAll(this)">
+                        </th>
+                        <th class="py-3 px-6 text-left">Nome</th>
+                        <th class="py-3 px-6 text-left">Contato</th>
+                        <th class="py-3 px-6 text-center">Ações</th>
+                    </tr>
+                </thead>
 
-        <tbody id="solicitanteTable" class="text-sm sm:text-base">
-            {% for s in solicitantes %}
-            <tr class="border-b hover:bg-gray-100">
-                <!-- Checkbox -->
-                <td class="py-3 px-4 text-center">
-                    <input type="checkbox"
-                        class="rowCheckbox"
-                        name="ids"
-                        value="{{ s.id }}"
-                        data-nome="{{ s.nome }}">
-                </td>
+                <tbody id="solicitanteTable" class="text-sm sm:text-base">
+                    {% for s in solicitantes %}
+                    <tr class="border-b hover:bg-gray-100">
+                        <!-- Checkbox -->
+                        <td class="py-3 px-6">
+                            <input type="checkbox"
+                                class="selectRow"
+                                name="ids"
+                                value="{{ s.id }}"
+                                data-nome="{{ s.nome }}">
+                        </td>
 
-                <!-- Nome -->
-                <td class="py-3 px-6 text-blue-600 hover:underline">
-                    <a href="{% url 'solicitantes:detalhar_solicitante' s.id %}">
-                        {{ s.nome }}
-                    </a>
-                </td>
+                        <!-- Nome -->
+                        <td class="py-3 px-6 text-blue-600 hover:underline">
+                            <a href="{% url 'solicitantes:detalhar_solicitante' s.id %}">
+                                {{ s.nome }}
+                            </a>
+                        </td>
 
-                <!-- Contato -->
-                <td class="py-3 px-6">{{ s.contato }}</td>
+                        <!-- Contato -->
+                        <td class="py-3 px-6">{{ s.contato }}</td>
 
-                <!-- Ações -->
-                <td class="py-3 px-6 text-center flex justify-center space-x-2">
-                    <a href="{% url 'solicitantes:editar_solicitante' s.id %}"
-                       class="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded">
-                        Editar
-                    </a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4" class="text-center py-6 text-gray-500 italic">
-                    Nenhum solicitante cadastrado.
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-        </table>
+                        <!-- Ações -->
+                        <td class="py-3 px-6 flex space-x-2">
+                            <a href="{% url 'solicitantes:editar_solicitante' s.id %}"
+                            class="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded">
+                                Editar
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-6 text-gray-500 italic">
+                            Nenhum solicitante cadastrado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </form> 
 </div>
 

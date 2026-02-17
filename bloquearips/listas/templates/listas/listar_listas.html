@@ -43,7 +43,7 @@
         </div>
 
     <div class="min-w-full max-h-[500px] overflow-y-auto border border-gray-200 rounded">
-            <table id="listaTable" class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full">
+            <table class="bg-white rounded-xl shadow-lg overflow-hidden w-full table-auto min-w-full">
                 <thead class="bg-gray-600 text-white sticky top-0 z-20">
                     <tr>
                         <th class="py-3 px-6">
@@ -61,7 +61,11 @@
                     {% for lista in listas %}
                     <tr class="border-b hover:bg-gray-100">
                         <td class="py-3 px-6">
-                            <input type="checkbox" class="selectRow" name="ids" value="{{ lista.id }}" data-nome="{{ lista.nome }}">
+                            <input type="checkbox" 
+                            class="selectRow" 
+                            name="ids" 
+                            value="{{ lista.id }}" 
+                            data-nome="{{ lista.nome }}">
                         </td>
                         <td class="py-3 px-6">
                             <a href="{% url 'listas:detalhar_lista' lista.id %}" class="text-blue-600 hover:underline">
