@@ -132,7 +132,7 @@ def massa_enderecos(request):
 
         messages.success(request, f'Ação "{acao}" realizada com sucesso!')
 
-    return redirect('listar_enderecos')
+    return redirect('enderecos:listar_enderecos')
 
 
 

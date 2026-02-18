@@ -33,13 +33,13 @@
                 Novo Solicitante
             </a>
             <button type="button"
-                    onclick="openConfirmModal(
-                        document.getElementById('solicitantesForm'),
-                        document.querySelectorAll('.rowCheckbox:checked'),
-                        'Confirmação de Exclusão',
-                        'Tem certeza que deseja excluir os solicitantes selecionados?'
-                    )"
-                   class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 whitespace-nowrap">
+                onclick="openConfirmModal(
+                    document.getElementById('solicitantesForm'),
+                    document.querySelectorAll('.selectRow:checked'),
+                    'Confirmação de Exclusão',
+                    'Tem certeza que deseja excluir os solicitantes selecionados?'
+                )"
+                class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 whitespace-nowrap">
                 Excluir selecionados
             </button>
         </div>
@@ -107,12 +107,12 @@
 <!-- Script para filtrar tabela -->
 <script>
 function toggleAll(master) {
-    document.querySelectorAll('.rowCheckbox')
+    document.querySelectorAll('.selectRow')
         .forEach(cb => cb.checked = master.checked);
 }
 
 function confirmBulkDelete() {
-    const selected = document.querySelectorAll('.rowCheckbox:checked');
+    const selected = document.querySelectorAll('.selectRow:checked');
 
     if (selected.length === 0) {
         alert('Selecione pelo menos um solicitante.');
