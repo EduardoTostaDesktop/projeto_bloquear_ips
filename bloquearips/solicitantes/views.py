@@ -64,6 +64,22 @@ def excluir_solicitante(request, solicitante_id):
 def excluir_solicitantes_massa(request):
     if request.method == "POST":
         ids = request.POST.getlist("ids")
-        Solicitante.objects.filter(id__in=ids).delete()
-        messages.success(request, "Solicitantes excluídos com sucesso.")
+        solicitantes = Solicitante.objects.filter(id__in=ids)
+
+        nao_excluidos = []
+
+        for solicitante in solicitantes:
+            if solicitante.solicitacao_set.exists() or solicitante.lista_set.exists():
+                nao_excluidos.append(solicitante.nome)
+            else:
+                solicitante.delete()
+
+        if nao_excluidos:
+            messages.error(
+                request,
+                f"Os seguintes solicitantes não puderam ser excluídos pois possuem vínculos: {', '.join(nao_excluidos)}"
+            )
+        else:
+            messages.success(request, "Solicitantes excluídos com sucesso.")
+
     return redirect("solicitantes:listar_solicitantes")
