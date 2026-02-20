@@ -30,17 +30,20 @@
             <div class="flex items-center space-x-4">
                 <!-- Nome e Logout -->
                 <div class="flex flex-col items-end">
-                    <span class="text-sm font-medium">{{ user.username }}</span>
+                    <a href="{% url 'usuarios:perfil' %}" class="hover:underline">
+                        <span class="text-sm font-medium">{{ user.username }}</span>
+                    </a>
                     <form method="POST" action="{% url 'usuarios:logout' %}">
                         {% csrf_token %}
-                        <button type="submit" class="text-sm hover:underline cursor-pointer">Logout</button>
+                        <button type="submit" class="text-sm hover:underline cursor-pointer">Sair</button>
                     </form>
                 </div>
                 
-                <!-- Ícone de perfil -->
+                <!-- Ícone de perfil 
                  <a href="{% url 'usuarios:perfil' %}" class="hover:underline">
                     <img src="{% static 'images/perfil.png' %}" alt="Perfil" class="h-8 w-8 rounded-full border-2 border-white">
                 </a>
+                -->
             </div>
             {% else %}
                 <a href="{% url 'usuarios:login' %}" class="px-3 hover:underline">Login</a>
