@@ -1,11 +1,15 @@
 from datetime import date, datetime
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
-import openpyxl
 from usuarios.decorators import allowed_roles
 from .models import Lista
+import openpyxl
 from enderecos.models import Endereco
 from solicitantes.models import Solicitante
+from solicitacoes.utils import aplicar_status_endereco
+from enderecos.views import detectar_tipo
+from django.db import transaction
+
 
 @allowed_roles(['admin', 'engredes'])
 def listar_listas(request):
@@ -17,11 +21,22 @@ def detalhar_lista(request, lista_id):
     lista = get_object_or_404(Lista, id=lista_id)
     return render(request, 'listas/detalhar_lista.html', {'lista': lista})
 
+
+from django.db import transaction
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from datetime import datetime, date
+import openpyxl
+
+
 @allowed_roles(['admin', 'engredes'])
+@transaction.atomic
 def criar_lista(request):
+
     if request.method == 'POST':
+
         nome = request.POST.get('nome')
-        solicitante = request.POST.get('solicitante')
+        solicitante_id = request.POST.get('solicitante')
         novo_solicitante_nome = request.POST.get("nome_solicitante")
         novo_solicitante_contato = request.POST.get("contato_solicitante")
         desc = request.POST.get('desc')
@@ -30,30 +45,111 @@ def criar_lista(request):
         arquivo = request.FILES.get('arquivo_csv')
         criador = request.user
 
-        # --- Seleciona ou cria solicitante ---
-        if novo_solicitante_nome and novo_solicitante_nome.strip() != "":
+        # ----------------------------
+        # 🔹 1. Seleciona ou cria solicitante
+        # ----------------------------
+        if novo_solicitante_nome and novo_solicitante_nome.strip():
             solicitante, created = Solicitante.objects.get_or_create(
                 nome=novo_solicitante_nome.strip(),
-                defaults={"contato": novo_solicitante_contato.strip() if novo_solicitante_contato else ""}
+                defaults={
+                    "contato": novo_solicitante_contato.strip()
+                    if novo_solicitante_contato else ""
+                }
             )
+
             if created:
-                messages.success(request, f"Novo solicitante '{novo_solicitante_nome}' cadastrado com sucesso!")
-        elif solicitante and solicitante.strip() != "":
-            solicitante = get_object_or_404(Solicitante, id=solicitante)
+                messages.success(
+                    request,
+                    f"Novo solicitante '{novo_solicitante_nome}' cadastrado com sucesso!"
+                )
+
+        elif solicitante_id:
+            solicitante = get_object_or_404(Solicitante, id=solicitante_id)
+
         else:
-            messages.error(request, "Você deve selecionar um solicitante ou cadastrar um novo.")
+            messages.error(
+                request,
+                "Você deve selecionar um solicitante ou cadastrar um novo."
+            )
             return redirect("listas:criar_lista")
 
-        from datetime import datetime
+        # ----------------------------
+        # 🔹 2. Validação da data
+        # ----------------------------
         if data_prevista_desbloqueio:
             try:
-                data_prevista_desbloqueio = datetime.strptime(data_prevista_desbloqueio, "%Y-%m-%d")
+                data_prevista_desbloqueio = datetime.strptime(
+                    data_prevista_desbloqueio,
+                    "%Y-%m-%d"
+                ).date()
+
+                if data_prevista_desbloqueio < date.today():
+                    messages.error(
+                        request,
+                        "A data de desbloqueio não pode ser anterior à data atual."
+                    )
+                    return redirect("listas:criar_lista")
+
             except ValueError:
-                messages.error(request, "Formato de data inválido. Use YYYY-MM-DD.")
-                return redirect('listas:criar_lista')
+                messages.error(
+                    request,
+                    "Formato de data inválido. Use YYYY-MM-DD."
+                )
+                return redirect("listas:criar_lista")
         else:
             data_prevista_desbloqueio = None
 
+        # ----------------------------
+        # 🔹 3. Processar e validar Excel ANTES de criar a lista
+        # ----------------------------
+        enderecos_processados = []
+
+        if not arquivo:
+            messages.error(request, "É obrigatório enviar um arquivo Excel.")
+            return redirect("listas:criar_lista")
+
+        try:
+            wb = openpyxl.load_workbook(arquivo)
+            ws = wb.active
+
+            for idx, row in enumerate(ws.iter_rows(min_row=1, values_only=True), start=1):
+
+                if not row or not row[0]:
+                    continue
+
+                endereco_text = str(row[0]).strip()
+
+                if not endereco_text:
+                    continue
+
+                try:
+                    tipo = detectar_tipo(endereco_text)
+                    enderecos_processados.append((endereco_text, tipo))
+
+                except Exception as e:
+                    messages.error(
+                        request,
+                        f"Erro na linha {idx}: '{endereco_text}' inválido. {e}"
+                    )
+                    return redirect("listas:criar_lista")
+
+        except Exception as e:
+            messages.error(
+                request,
+                f"Erro ao processar o arquivo Excel: {e}"
+            )
+            return redirect("listas:criar_lista")
+
+        if not enderecos_processados:
+            messages.error(
+                request,
+                "Nenhum endereço válido encontrado no arquivo."
+            )
+            return redirect("listas:criar_lista")
+
+        # ----------------------------
+        # 🔹 4. Criar lista (só agora!)
+        # ----------------------------
         lista = Lista.objects.create(
             nome=nome,
             solicitante=solicitante,
@@ -63,40 +159,40 @@ def criar_lista(request):
             data_prevista_desbloqueio=data_prevista_desbloqueio
         )
 
-        # Processa arquivo Excel **dentro do POST**
-        if arquivo:
-            try:
-                import openpyxl
-                wb = openpyxl.load_workbook(arquivo)
-                ws = wb.active
+        # ----------------------------
+        # 🔹 5. Salvar endereços
+        # ----------------------------
+        for endereco_text, tipo in enderecos_processados:
 
-                for row in ws.iter_rows(min_row=1, values_only=True):
-                    if not row or not row[0]:
-                        continue
-                    endereco_text = str(row[0]).strip()
-                    if endereco_text:
-                        endereco_obj, created = Endereco.objects.get_or_create(
-                            endereco=endereco_text
-                        )
-                        lista.enderecos.add(endereco_obj)
+            endereco_obj, created = Endereco.objects.get_or_create(
+                endereco=endereco_text
+            )
 
-            except Exception as e:
-                messages.error(request, f"Erro ao processar o arquivo Excel: {e}")
+            if created:
+                endereco_obj.tipo = tipo
+                endereco_obj.save(update_fields=["tipo"])
+
+            lista.enderecos.add(endereco_obj)
+
+            aplicar_status_endereco(
+                endereco=endereco_obj,
+                tipo="DESBLOQUEIO",
+                data_desbloqueio=data_prevista_desbloqueio,
+                data_renovacao=None
+            )
 
         messages.success(request, "Lista criada com sucesso!")
-        return redirect('listas:listar_listas')
+        return redirect("listas:listar_listas")
 
-    # GET
+    # ----------------------------
+    # 🔹 GET
+    # ----------------------------
     solicitantes = Solicitante.objects.all()
-    return render(request, 'listas/criar_lista.html', {'solicitantes': solicitantes})
-
-from datetime import datetime, date
-from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib import messages
-from usuarios.decorators import allowed_roles
-from .models import Lista
-from solicitantes.models import Solicitante
-
+    return render(
+        request,
+        "listas/criar_lista.html",
+        {"solicitantes": solicitantes}
+    )
 
 @allowed_roles(['admin', 'engredes'])
 def editar_lista(request, lista_id):

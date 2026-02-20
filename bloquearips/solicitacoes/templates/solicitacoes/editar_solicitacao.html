@@ -27,13 +27,22 @@
                 class="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-blue-300">{{ solicitacao.obs }}</textarea>
         </div>
 
-        <!-- Data Prevista -->
+        <!-- Data Desbloqueio -->
         <div class="mb-4">
-            <label for="data_prevista_desbloqueio" class="block font-semibold mb-1">Data Prevista:</label>
+            <label for="data_prevista_desbloqueio" class="block font-semibold mb-1">Data Prevista Desbloqueio:</label>
             <input type="date" name="data_prevista_desbloqueio" id="data_prevista_desbloqueio"
                 value="{{ solicitacao.data_prevista_desbloqueio|date:'Y-m-d' }}"
                 class="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-blue-300">
         </div>
+
+        <!-- Data Renovação -->
+        <div class="mb-4">
+            <label for="data_prevista_renovacao" class="block font-semibold mb-1">Data Prevista Renovação:</label>
+            <input type="date" name="data_prevista_renovacao" id="data_prevista_renovacao"
+                value="{{ solicitacao.data_prevista_renovacao|date:'Y-m-d' }}"
+                class="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-blue-300">
+        </div>
+
 
         <!-- Botões -->
         <div class="flex justify-end space-x-3 pt-4">

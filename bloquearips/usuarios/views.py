@@ -25,7 +25,7 @@ def cadastrar_usuario(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Usuário cadastrado com sucesso!")
-            return redirect("lista_usuarios")
+            return redirect("usuarios:lista_usuarios")
     else:
         form = UsuarioCreateForm()
     return render(request, "usuarios/cadastrar_usuario.html", {"form": form})
@@ -46,7 +46,7 @@ def editar_usuario(request, usuario_id):
         usuario.tipo = request.POST.get('tipo')
         usuario.save()
         messages.success(request, "Usuário atualizado com sucesso!")
-        return redirect('lista_usuarios')
+        return redirect('usuarios:lista_usuarios')
 
     return render(request, 'usuarios/editar_usuario.html', {
         'usuario': usuario,
@@ -59,7 +59,7 @@ def excluir_usuario(request, usuario_id):
     usuario = get_object_or_404(Usuario, id=usuario_id)
     usuario.delete()
     messages.success(request, "Usuário excluído com sucesso!")
-    return redirect('lista_usuarios')
+    return redirect('usuarios:lista_usuarios')
 
 @admin_required
 def excluir_usuarios_massa(request):

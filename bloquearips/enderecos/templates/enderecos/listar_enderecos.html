@@ -96,8 +96,7 @@
                     <th class="py-3 px-3 sm:px-6 text-left hidden sm:table-cell">Nome</th>
                     <th class="py-3 px-3 text-center hidden md:table-cell">Última solicitação</th>
                     <th class="py-3 px-3 text-center hidden lg:table-cell">Renovação</th>
-                    <th class="py-3 px-3 sm:px-6 text-left hidden md:table-cell">Descrição</th>
-                    <th class="py-3 px-3 sm:px-6 text-left hidden lg:table-cell">Observação</th>
+                    <th class="py-3 px-3 text-center hidden lg:table-cell">Previsão de Desbloqueio</th>
                     <th class="py-3 px-3 sm:px-6 text-center">Status</th>
                     {% if request.user.tipo != "noc" %}
                     <th class="py-3 px-3 sm:px-6 text-center">Ações</th>
@@ -139,8 +138,13 @@
                             —
                         {% endif %}
                     </td>
-                    <td class="py-2 px-3 sm:px-6 hidden md:table-cell truncate max-w-[150px]" title="{{ endereco.desc }}">{{ endereco.desc|default_if_none:""|truncatechars:20 }}</td>
-                    <td class="py-2 px-3 sm:px-6 hidden lg:table-cell truncate max-w-[150px]" title="{{ endereco.obs }}">{{ endereco.obs|default_if_none:""|truncatechars:20 }}</td>
+                     <td class="py-2 px-3 text-center hidden lg:table-cell">
+                        {% if endereco.data_desbloqueio %}
+                            {{ endereco.data_desbloqueio|date:"d/m/Y" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
                     <td class="py-2 px-3 sm:px-6 text-center" data-status="{{ endereco.status|lower }}">
                         {% if endereco.status == "bloqueado" %}
                             <span class="text-red-600 font-semibold">Bloqueado</span>

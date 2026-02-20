@@ -205,7 +205,7 @@ def editar_solicitacao(request, solicitacao_id):
         solicitacao.obs = request.POST.get("obs", solicitacao.obs)
         solicitacao.desc = request.POST.get("desc", solicitacao.desc)
 
-        # --- Data prevista de desbloqueio ---
+        # --- Datas ---
         try:
             data_prevista_desbloqueio = parse_data_post(
                 request,
@@ -213,45 +213,68 @@ def editar_solicitacao(request, solicitacao_id):
                 "Data prevista de desbloqueio",
                 permitir_passado=True
             )
+
+            data_prevista_renovacao = parse_data_post(
+                request,
+                "data_prevista_renovacao",
+                "Data prevista de renovação",
+                permitir_passado=True
+            )
+
         except DataInvalidaError:
             return redirect(
                 "solicitacoes:editar_solicitacao",
                 solicitacao_id=solicitacao.id
             )
 
+        # 🔹 Validação desbloqueio
         if data_prevista_desbloqueio:
-            # ⚠️ comparação correta: date × date
             if data_prevista_desbloqueio < solicitacao.data_criacao.date():
                 messages.error(
                     request,
-                    "A data prevista não pode ser anterior à data de criação da solicitação!"
+                    "A data de desbloqueio não pode ser anterior à data de criação da solicitação!"
                 )
                 return redirect(
                     "solicitacoes:editar_solicitacao",
                     solicitacao_id=solicitacao.id
                 )
 
-            # Atualiza solicitação
-            solicitacao.data_prevista_desbloqueio = data_prevista_desbloqueio
+        # 🔹 Validação renovação
+        if data_prevista_renovacao:
+            if data_prevista_renovacao < solicitacao.data_criacao.date():
+                messages.error(
+                    request,
+                    "A data de renovação não pode ser anterior à data de criação da solicitação!"
+                )
+                return redirect(
+                    "solicitacoes:editar_solicitacao",
+                    solicitacao_id=solicitacao.id
+                )
 
-            # Atualiza lista e endereços
-            if solicitacao.lista:
-                solicitacao.lista.data_prevista_desbloqueio = data_prevista_desbloqueio
-                solicitacao.lista.save(update_fields=["data_prevista_desbloqueio"])
-
-                for endereco in solicitacao.lista.enderecos.all():
-                    aplicar_status_endereco(
-                        endereco=endereco,
-                        tipo=solicitacao.tipo,
-                        data_desbloqueio=data_prevista_desbloqueio,
-                        data_renovacao=solicitacao.data_prevista_renovacao
-                    )
-
+        # 🔹 Atualiza solicitação
+        solicitacao.data_prevista_desbloqueio = data_prevista_desbloqueio
+        solicitacao.data_prevista_renovacao = data_prevista_renovacao
         solicitacao.save()
+
+        # 🔹 Atualiza lista
+        if solicitacao.lista:
+            solicitacao.lista.data_prevista_desbloqueio = data_prevista_desbloqueio
+            solicitacao.lista.save(update_fields=["data_prevista_desbloqueio"])
+
+            # 🔹 Atualiza todos os endereços da lista
+            for endereco in solicitacao.lista.enderecos.all():
+                aplicar_status_endereco(
+                    endereco=endereco,
+                    tipo=solicitacao.tipo,
+                    data_desbloqueio=data_prevista_desbloqueio,
+                    data_renovacao=data_prevista_renovacao
+                )
+
         messages.success(
             request,
             "Solicitação, lista e endereços atualizados com sucesso!"
         )
+
         return redirect(
             "solicitacoes:detalhar_solicitacao",
             solicitacao_id=solicitacao.id

@@ -1,6 +1,5 @@
 import ipaddress
 from django.contrib import messages
-from urllib.parse import urlparse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -11,6 +10,10 @@ from django.db.models import Prefetch
 from solicitacoes.models import Solicitacao
 from django.utils import timezone
 from solicitacoes.utils import aplicar_status_endereco
+import ipaddress
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
+import re
 
 
 @login_required
@@ -82,20 +85,38 @@ def listar_enderecos(request):
 
 
 
-def detectar_tipo(endereco):
+def detectar_tipo(valor):
+    valor = valor.strip()
+
+    # 1️⃣ Tenta validar como IP (IPv4 ou IPv6)
     try:
-        ip = ipaddress.ip_address(endereco)
-        return "ipv4" if ip.version == 4 else "ipv6"
+        ip = ipaddress.ip_address(valor)
+        if ip.version == 4:
+            return "IPv4"
+        elif ip.version == 6:
+            return "IPv6"
     except ValueError:
-        try:
-            result = urlparse(endereco)
-            if result.scheme and result.netloc:
-                return "url"
-        except:
-            pass
-    return "desconhecido"
+        pass
 
+    # 2️⃣ Se parece IP mas falhou na validação → erro
+    if re.fullmatch(r"[0-9\.]+", valor):
+        raise ValueError("IPv4 inválido.")
 
+    if ":" in valor and not valor.startswith(("http://", "https://")):
+        raise ValueError("IPv6 inválido.")
+
+    # 3️⃣ Só aceita URL com http/https
+    if not valor.startswith(("http://", "https://")):
+        raise ValueError("URL deve começar com http:// ou https://")
+
+    validator = URLValidator()
+    try:
+        validator(valor)
+        return "URL"
+    except ValidationError:
+        raise ValueError("URL inválida.")
+    
+    
 
 @allowed_roles(['admin', 'engredes'])
 def massa_enderecos(request):
