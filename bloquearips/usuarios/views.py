@@ -95,7 +95,7 @@ def alterar_senha(request):
             # Mantém o usuário logado
             update_session_auth_hash(request, user)
             messages.success(request, "Senha alterada com sucesso!")
-            return redirect("perfil")
+            return redirect("usuarios:perfil")
     else:
         form = PasswordChangeForm(user=request.user)
 
