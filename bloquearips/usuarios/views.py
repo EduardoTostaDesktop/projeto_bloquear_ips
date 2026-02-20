@@ -40,17 +40,27 @@ def lista_usuarios(request):
 @admin_required
 def editar_usuario(request, usuario_id):
     usuario = get_object_or_404(Usuario, id=usuario_id)
+
     if request.method == "POST":
-        usuario.username = request.POST.get('username')
-        usuario.email = request.POST.get('email')
-        usuario.tipo = request.POST.get('tipo')
+        novo_username = request.POST.get('username')
+        novo_email = request.POST.get('email')
+        novo_tipo = request.POST.get('tipo')
+
+        # 🔒 Verifica se já existe outro usuário com esse username
+        if Usuario.objects.filter(username=novo_username).exclude(id=usuario.id).exists():
+            messages.error(request, "Já existe outro usuário com esse username.")
+            return redirect('usuarios:editar_usuario', usuario_id=usuario.id)
+
+        usuario.username = novo_username
+        usuario.email = novo_email
+        usuario.tipo = novo_tipo
         usuario.save()
+
         messages.success(request, "Usuário atualizado com sucesso!")
         return redirect('usuarios:lista_usuarios')
 
     return render(request, 'usuarios/editar_usuario.html', {
         'usuario': usuario,
-        'Usuario': Usuario,
     })
 
 # Excluir usuário — só administradores

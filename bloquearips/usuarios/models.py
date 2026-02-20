@@ -15,6 +15,11 @@ class Usuario(AbstractUser):
         verbose_name="Nome completo"
     )
 
+    email = models.EmailField(
+        unique=True,
+        verbose_name="E-mail"
+    )
+
     tipo = models.CharField(
         max_length=10,
         choices=TIPOS,
