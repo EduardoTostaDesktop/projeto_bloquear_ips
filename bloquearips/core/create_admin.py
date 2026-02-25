@@ -1,5 +1,5 @@
-from django.contrib.auth import get_user_model
 import os
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
@@ -9,7 +9,16 @@ password = os.environ.get("DJANGO_SUPERUSER_PASSWORD")
 
 if username and email and password:
     if not User.objects.filter(username=username).exists():
-        User.objects.create_superuser(username, email, password)
-        print("Superuser criado com sucesso!")
+        user = User.objects.create_superuser(
+            username=username,
+            email=email,
+            password=password,
+        )
+
+        # 👇 ajuste o nome do campo se for diferente
+        user.tipo = "administrador"
+        user.save()
+
+        print("Superuser administrador criado com sucesso!")
     else:
         print("Superuser já existe.")
