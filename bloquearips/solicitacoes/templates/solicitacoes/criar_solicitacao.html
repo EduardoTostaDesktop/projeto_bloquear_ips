@@ -59,7 +59,7 @@
         <div id="nova_lista_campos" style="display:none;">
             <div class="mt-3">
                 <label class="block font-semibold mb-1">Nome da Nova Lista</label>
-                <input type="text" name="nome_lista" class="border rounded px-3 py-2 w-full" placeholder="Digite o nome da lista">
+                <input type="text" name="nome_lista" maxlength="50" class="border rounded px-3 py-2 w-full" placeholder="Digite o nome da lista">
             </div>
 
             <!-- Upload do arquivo -->
@@ -136,13 +136,13 @@
         <!-- Descrição -->
         <div>
             <label class="block font-semibold mb-1">Descrição</label>
-            <textarea name="desc" class="border rounded px-3 py-2 w-full" rows="3"></textarea>
+            <textarea name="desc" class="border rounded px-3 py-2 w-full" rows="3" maxlength="100"></textarea>
         </div>
 
         <!-- Observações -->
         <div>
             <label class="block font-semibold mb-1">Observações</label>
-            <textarea name="obs" class="border rounded px-3 py-2 w-full" rows="3"></textarea>
+            <textarea name="obs" class="border rounded px-3 py-2 w-full" rows="3" maxlength="100"></textarea>
         </div>
 
         <!-- Botão -->

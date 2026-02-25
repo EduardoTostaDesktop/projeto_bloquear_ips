@@ -12,11 +12,11 @@ class Solicitacao(models.Model):
 
     lista = models.ForeignKey(Lista, on_delete=models.CASCADE, related_name='solicitacoes')
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='BLOQUEIO')
-    nome = models.CharField(max_length=255, blank=True)  # Novo campo nome
+    nome = models.CharField(max_length=50, blank=True)  # Novo campo nome
     data_prevista_desbloqueio = models.DateTimeField(null=True, blank=True)
     data_prevista_renovacao = models.DateTimeField(null=True, blank=True)
-    desc = models.TextField(blank=True, null=True)
-    obs = models.TextField(blank=True, null=True)
+    desc = models.TextField(max_length=100,blank=True, null=True)
+    obs = models.TextField(max_length=100,blank=True, null=True)
     solicitante = models.ForeignKey(Solicitante, on_delete=models.PROTECT)
     criado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     data_criacao = models.DateTimeField(auto_now_add=True)

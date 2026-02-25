@@ -9,8 +9,8 @@ class Lista(models.Model):
         on_delete=models.PROTECT
     )
     data_registro = models.DateTimeField(auto_now_add=True)
-    desc = models.TextField(blank=True, null=True)
-    obs = models.TextField(blank=True, null=True)
+    desc = models.TextField(max_length=100,blank=True, null=True)
+    obs = models.TextField(max_length=100, blank=True, null=True)
     criador = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT

@@ -26,9 +26,9 @@ class Endereco(models.Model):
         blank=True,
         verbose_name="Data da última solicitação"
     )
-    nome = models.CharField(max_length=100, blank=True, null=True)
-    desc = models.TextField(blank=True, null=True)
-    obs = models.TextField(blank=True, null=True)
+    nome = models.CharField(max_length=50, blank=True, null=True)
+    desc = models.TextField(max_length=100,blank=True, null=True)
+    obs = models.TextField(max_length=100,blank=True, null=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_desbloqueio = models.DateField(blank=True, null=True)
     data_renovacao = models.DateField(blank=True, null=True)

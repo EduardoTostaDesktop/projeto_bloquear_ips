@@ -10,20 +10,20 @@
         <!--Nome-->
         <div class="mb-4">
             <label class="block font-semibold mb-1">Nome</label>
-            <input type="text" name="nome" value="{{ solicitacao.nome }}" required class="w-full p-2 border rounded">
+            <input type="text" name="nome" maxlength="50" value="{{ solicitacao.nome }}" required class="w-full p-2 border rounded">
         </div>
 
         <!-- Descrição -->
         <div class="mb-4">
             <label for="desc" class="block font-semibold mb-1">Descrição:</label>
-            <textarea name="desc" id="desc" rows="3"
+            <textarea name="desc" id="desc" rows="3" maxlength="100"
                 class="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-blue-300">{{ solicitacao.desc }}</textarea>
         </div>
 
         <!-- Observações -->
         <div class="mb-4">
             <label for="obs" class="block font-semibold mb-1">Observações:</label>
-            <textarea name="obs" id="obs" rows="3"
+            <textarea name="obs" id="obs" rows="3" maxlength="100"
                 class="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-blue-300">{{ solicitacao.obs }}</textarea>
         </div>
 
