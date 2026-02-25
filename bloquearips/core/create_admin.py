@@ -16,7 +16,7 @@ if username and email and password:
         )
 
         # 👇 ajuste o nome do campo se for diferente
-        user.tipo = "administrador"
+        user.tipo = "admin"
         user.save()
 
         print("Superuser administrador criado com sucesso!")
